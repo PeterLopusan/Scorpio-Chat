@@ -143,6 +143,8 @@ class ConversationFragment : Fragment() {
         }
     }
 
+    //kreatívny komentár
+
 
     private fun showPopupMenu(data: Triple<String, Message, View>) {
         val context = requireContext()
