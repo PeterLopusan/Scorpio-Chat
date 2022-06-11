@@ -144,6 +144,7 @@ class ConversationFragment : Fragment() {
     }
 
     //kreatívny komentár
+    //druhý komentár
 
 
     private fun showPopupMenu(data: Triple<String, Message, View>) {
