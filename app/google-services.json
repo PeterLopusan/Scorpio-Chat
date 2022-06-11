@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "105334913048",
+    "project_id": "scorpio-chat",
+    "storage_bucket": "scorpio-chat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:105334913048:android:38626135b295a53401eb6d",
+        "android_client_info": {
+          "package_name": "com.example.scorpiochat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "105334913048-gtd1shrrrok05ad6656o7dl1ocah4eoc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCU66gDx0C97n63uLoF3NBB_mht3zxsN_E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "105334913048-gtd1shrrrok05ad6656o7dl1ocah4eoc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

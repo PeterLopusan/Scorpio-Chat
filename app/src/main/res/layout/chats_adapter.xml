@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="10dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/img_profile_picture"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@drawable/loading_animation"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/default_icon" />
+
+    <ImageView
+        android:id="@+id/img_online_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/online_icon"
+        app:layout_constraintBottom_toTopOf="@id/img_profile_picture"
+        app:layout_constraintEnd_toEndOf="@id/img_profile_picture"
+        app:layout_constraintHorizontal_bias="0.955"
+        app:layout_constraintStart_toStartOf="@id/img_profile_picture"
+        app:layout_constraintTop_toBottomOf="@id/img_profile_picture"
+        app:layout_constraintVertical_bias="0.255" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="5dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toStartOf="@+id/txt_time"
+        app:layout_constraintStart_toEndOf="@id/img_profile_picture"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/txt_username"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:text="Peter Lopušan" />
+
+        <TextView
+            android:id="@+id/txt_message"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:singleLine="true"
+            android:textSize="20sp"
+            android:textStyle="italic"
+            tools:text="Hello. How are you?" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txt_time"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="12:54" />
+
+    <ImageView
+        android:id="@+id/img_new_message"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="5dp"
+        android:src="@drawable/ic_baseline_fiber_new_24"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/txt_time"
+        app:layout_constraintTop_toBottomOf="@id/txt_time" />
+
+    <TextView
+        android:id="@+id/txt_new_message_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/new_message_count_background"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/img_new_message"
+        app:layout_constraintTop_toTopOf="@id/img_new_message"
+        tools:text="5" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

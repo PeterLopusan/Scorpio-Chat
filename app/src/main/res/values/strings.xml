@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">Scorpio Chat</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+
+    <string name="username">Username</string>
+    <string name="email">E-mail</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="confirm">Confirm</string>
+    <string name="create_account">Create account</string>
+    <string name="login_failed">User authentication failed. Please try again</string>
+    <string name="login">Login to app</string>
+    <string name="missing_input_value">Missing input value/s </string>
+    <string name="passwords_do_not_match">Passwords do not match </string>
+    <string name="welcome_to_scorpio_chat">Account was created. Welcome to Scorpio Chat</string>
+    <string name="email_is_already_used">The email address is already in use by another account.</string>
+    <string name="invalid_password">The given password is invalid. (Password should be at least 6 characters)</string>
+    <string name="email_badly_formatted">The email address is badly formatted.</string>
+    <string name="chats">Chats</string>
+    <string name="settings">Settings</string>
+    <string name="about_app">About app</string>
+    <string name="search">Search</string>
+    <string name="send_message">Send a message</string>
+    <string name="time_edit">%1$s\nEdited</string>
+    <string name="time_seen">%1$s ✓✓</string>
+    <string name="take_photo">Take a photo</string>
+    <string name="select_from_gallery">Select from gallery</string>
+    <string name="last_seen_time">Last seen at %1$s</string>
+    <string name="last_seen_date_time">Last seen %1$s at %2$s</string>
+    <string name="online">Online</string>
+    <string name="deleted_user"><b><i>Deleted user</i></b></string>
+    <string name="search_contact">Search contact</string>
+    <string name="account"><u>Account</u> </string>
+    <string name="general"><u>General (coming soon)</u> </string>
+    <string name="send_reset_password_email">Are you sure that you want to send email for reset password?</string>
+    <string name="change_username">Change username</string>
+    <string name="cancel">Cancel</string>
+    <string name="profile_picture_saved">Profile picture was saved</string>
+    <string name="reset_password">Reset password</string>
+    <string name="reset_password_mail_send">Email for resetting was send to %1$s</string>
+    <string name="reset_password_mail_send_failed">Sending email for resetting failed</string>
+    <string name="change_email">Change email</string>
+    <string name="new_email_set">New email was set</string>
+    <string name="new_email_failed">New email set failed</string>
+    <string name="confirm_with_password">Confirm with password</string>
+    <string name="sign_out">Sign out</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="delete_account">Delete account</string>
+    <string name="account_was_deleted">Account was successfully deleted</string>
+    <string name="delete_account_failed">Deleting account failed</string>
+    <string name="change_language">Change language</string>
+    <string name="format_time">Format time</string>
+    <string name="notifications">Notifications</string>
+    <string name="change_theme">Change theme</string>
+    <string name="delete">Delete</string>
+    <string name="mute">Mute</string>
+    <string name="block">Block</string>
+    <string name="reply">Reply</string>
+    <string name="copy">Copy</string>
+    <string name="forward">Forward</string>
+    <string name="edit">Edit</string>
+    <string name="copied_to_clipboard">Text copied to clipboard</string>
+    <string name="also_delete_for">Also delete for %1$s</string>
+    <string name="edited_text">Edited text:</string>
+    <string name="forwarded_text">Edited text:</string>
+    <string name="replied">Replied:</string>
+    <string name="forwarded">Forwarded:</string>
+
+
+
+    <string name="shared_pref_topic">Topic</string>
+    <string name="shared_pref_dark_theme">Dark Theme</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>
