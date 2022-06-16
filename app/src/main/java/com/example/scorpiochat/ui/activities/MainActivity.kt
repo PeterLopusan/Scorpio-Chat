@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun showUpButtonInsteadDrawerButton(showUpButton: Boolean) {
-        isUpButton = if(showUpButton) {
+        isUpButton = if (showUpButton) {
             supportActionBar?.setHomeAsUpIndicator(
                 androidx.appcompat.R.drawable.abc_ic_ab_back_material
             )
@@ -96,13 +96,9 @@ class MainActivity : AppCompatActivity() {
         email.text = viewModel.getUserEmail()
         username.text = user.username
 
-        viewModel.getStorage().downloadUrl.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Glide.with(applicationContext)
-                    .load(task.result)
-                    .into(profilePicture)
-            }
-        }
+        Glide.with(applicationContext)
+            .load(user.customProfilePictureUri)
+            .into(profilePicture)
 
         modeSwitch.apply {
             val darkMode = this@MainActivity.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
@@ -124,7 +120,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setMode() {
-        if(SharedPreferencesManager.getDarkTheme(this)) {
+        if (SharedPreferencesManager.getDarkTheme(this)) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)

@@ -29,30 +29,21 @@ class SettingsViewModel : ViewModel() {
     fun loadUserInfo() {
         database.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if (userInfo.value == null) {
-                    for (dbChild in snapshot.children) {
-                        val user = dbChild.child(userInformation).getValue(User::class.java)
-                        if (user?.userId == auth.uid) {
-                            userInfo.value = user!!
-                            return
-                        }
+
+                for (dbChild in snapshot.children) {
+                    val user = dbChild.child(userInformation).getValue(User::class.java)
+                    if (user?.userId == auth.uid) {
+                        userInfo.value = user!!
+                        return
                     }
                 }
+
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Log.d("TAG", error.toString())
             }
         })
-    }
-
-    fun getCurrentProfilePictureStorageRef(): StorageReference {
-        val storageReference = if (userInfo.value?.customProfilePicture == true) {
-            storage.child(userInfo.value?.userId!!).child(customProfilePicture)
-        } else {
-            storage.child(defaultProfilePicture).child(default_icon)
-        }
-        return storageReference
     }
 
     fun getDefaultProfilePictureStorageRef(): StorageReference {
@@ -67,17 +58,22 @@ class SettingsViewModel : ViewModel() {
     }
 
     fun changeProfilePicture(profilePictureUri: Uri?) {
-        val update: Map<String, Boolean>
+        var update: Map<String, String>
 
         if (profilePictureUri == null) {
-            update = mapOf("customProfilePicture" to false)
             storage.child(auth.uid!!).child(customProfilePicture).delete()
+            storage.child(defaultProfilePicture).child(default_icon).downloadUrl.addOnCompleteListener { task ->
+                update = mapOf("customProfilePictureUri" to task.result.toString())
+                database.child(auth.uid!!).child(userInformation).updateChildren(update)
+            }
         } else {
-            update = mapOf("customProfilePicture" to true)
-            storage.child(auth.uid!!).child(customProfilePicture).putFile(profilePictureUri)
+            storage.child(auth.uid!!).child(customProfilePicture).putFile(profilePictureUri).addOnCompleteListener {
+                storage.child(auth.uid!!).child(customProfilePicture).downloadUrl.addOnCompleteListener { task ->
+                    update = mapOf("customProfilePictureUri" to task.result.toString())
+                    database.child(auth.uid!!).child(userInformation).updateChildren(update)
+                }
+            }
         }
-
-        database.child(auth.uid!!).child(userInformation).updateChildren(update)
     }
 
     fun changePassword(context: Context) {
@@ -91,7 +87,7 @@ class SettingsViewModel : ViewModel() {
     }
 
     fun changeEmail(newEmail: String, password: String, context: Context) {
-        if (newEmail != "") {
+        if (newEmail.isNotBlank() && password.isNotBlank()) {
             auth.signInWithEmailAndPassword(getUserEmail(), password).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     auth.currentUser!!.updateEmail(newEmail).addOnCompleteListener {
@@ -131,37 +127,34 @@ class SettingsViewModel : ViewModel() {
     }
 
     private fun deleteUserData() {
-        if (userInfo.value?.customProfilePicture == true) {
-            storage.child(auth.uid!!).child(customProfilePicture).delete()
-            storage.child(auth.uid!!).delete()
-        }
+        storage.child(auth.uid!!).child(customProfilePicture).delete()
+        storage.child(auth.uid!!).delete()
         database.child(auth.uid!!).removeValue()
     }
 
-    fun deleteAccount(context: Context, password: String) {
+    fun deleteAccount(password: String, context: Context) {
+        if (password.isNotBlank()) {
+            auth.signInWithEmailAndPassword(getUserEmail(), password).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    unsubscribeTopic(context)
+                    makeUserOffline()
+                    deleteUserData()
 
-        auth.signInWithEmailAndPassword(getUserEmail(), password).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                unsubscribeTopic(context)
-                makeUserOffline()
-                deleteUserData()
-
-                auth.currentUser?.delete()?.addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        Toast.makeText(context, context.getString(R.string.account_was_deleted), Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, context.getString(R.string.new_email_failed), Toast.LENGTH_SHORT).show()
+                    auth.currentUser?.delete()?.addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            Toast.makeText(context, context.getString(R.string.account_was_deleted), Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, context.getString(R.string.delete_account_failed), Toast.LENGTH_SHORT).show()
+                        }
                     }
+                } else {
+                    Toast.makeText(context, context.getString(R.string.new_email_failed), Toast.LENGTH_SHORT).show()
                 }
-            } else {
-                Toast.makeText(context, context.getString(R.string.new_email_failed), Toast.LENGTH_SHORT).show()
             }
         }
-
     }
 
     fun getUserEmail(): String {
         return auth.currentUser?.email!!
     }
-
 }

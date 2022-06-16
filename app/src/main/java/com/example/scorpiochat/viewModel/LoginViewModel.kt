@@ -39,10 +39,15 @@ class LoginViewModel : ViewModel() {
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 if (uri == null) {
-                    saveUserInfo(username, false)
+                    storage.child(defaultProfilePicture).child(default_icon).downloadUrl.addOnCompleteListener {
+                        saveUserInfo(username, it.result.toString())
+                    }
                 } else {
-                    saveUserInfo(username, true)
-                    storage.child(auth.uid!!).child(customProfilePicture).putFile(uri)
+                    storage.child(auth.uid!!).child(customProfilePicture).putFile(uri).addOnCompleteListener {
+                        storage.child(auth.uid!!).child(customProfilePicture).downloadUrl.addOnCompleteListener {
+                            saveUserInfo(username, it.result.toString())
+                        }
+                    }
                 }
                 text.value = context.getString(R.string.welcome_to_scorpio_chat)
             }
@@ -56,9 +61,9 @@ class LoginViewModel : ViewModel() {
         return text
     }
 
-    private fun saveUserInfo(username: String, customProfilePicture: Boolean) {
+    private fun saveUserInfo(username: String, profilePictureUri: String) {
         val userId = auth.currentUser!!.uid
-        val userInfo = User(username, userId, true, System.currentTimeMillis(), customProfilePicture)
+        val userInfo = User(username = username, userId = userId, online = true, lastSeen = System.currentTimeMillis(), customProfilePictureUri = profilePictureUri)
         database.child(userId).child(userInformation).setValue(userInfo)
     }
 

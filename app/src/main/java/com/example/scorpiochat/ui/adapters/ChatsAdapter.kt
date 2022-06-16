@@ -17,11 +17,15 @@ import com.example.scorpiochat.databinding.ChatsAdapterBinding
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 
-class ChatsAdapter(private val myId: String, private val applicationContext: Context?, private val onItemClicked: (Pair<User, Message>) -> Unit,private val onItemLongClick: (Pair<User, View>) -> Unit ) :
+class ChatsAdapter(
+    private val myId: String,
+    private val applicationContext: Context?,
+    private val onItemClicked: (Pair<User, Message>) -> Unit,
+    private val onItemLongClick: (Pair<User, View>) -> Unit
+) :
     ListAdapter<Triple<User, Message, Int>, ChatsAdapter.ChatsHolder>(DiffCallbackChats) {
 
     inner class ChatsHolder(private val binding: ChatsAdapterBinding) : RecyclerView.ViewHolder(binding.root) {
-        private val storage = FirebaseStorage.getInstance().reference
 
         fun setChatValues(data: Triple<User, Message, Int>) {
 
@@ -32,12 +36,10 @@ class ChatsAdapter(private val myId: String, private val applicationContext: Con
 
             val username: String
             val visibility: Int
-            val storageReference: StorageReference
 
             if (user.username == null) {
                 username = context.getString(R.string.deleted_user)
                 visibility = View.GONE
-                storageReference = storage.child(defaultProfilePicture).child(default_icon)
             } else {
                 username = user.username
 
@@ -45,12 +47,6 @@ class ChatsAdapter(private val myId: String, private val applicationContext: Con
                     View.VISIBLE
                 } else {
                     View.GONE
-                }
-
-                storageReference = if (user.customProfilePicture == true) {
-                    storage.child(user.userId!!).child(customProfilePicture)
-                } else {
-                    storage.child(defaultProfilePicture).child(default_icon)
                 }
             }
 
@@ -77,11 +73,11 @@ class ChatsAdapter(private val myId: String, private val applicationContext: Con
                 imgOnlineIcon.visibility = visibility
 
                 if (applicationContext != null) {
-                    storageReference.downloadUrl.addOnCompleteListener { task ->
-                        Glide.with(applicationContext)
-                            .load(task.result)
-                            .into(binding.imgProfilePicture)
-                    }
+                    Glide.with(applicationContext)
+                        .load(user.customProfilePictureUri)
+                        .placeholder(R.drawable.loading_animation)
+                        .error(R.drawable.loading_animation)
+                        .into(binding.imgProfilePicture)
                 }
             }
         }

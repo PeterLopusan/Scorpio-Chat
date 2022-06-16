@@ -3,10 +3,11 @@ package com.example.scorpiochat.viewModel
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.scorpiochat.allMessages
-import com.example.scorpiochat.conversation
+import com.example.scorpiochat.conversations
 import com.example.scorpiochat.data.Message
 import com.example.scorpiochat.data.User
+import com.example.scorpiochat.deleteProfilePicture
+import com.example.scorpiochat.delete_icon
 import com.example.scorpiochat.userInformation
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -14,10 +15,12 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 
 class ChatsViewModel : ViewModel() {
     private val auth = Firebase.auth
     private val database = FirebaseDatabase.getInstance().reference
+    private val storage = FirebaseStorage.getInstance().reference
     var listOfUsersAndMessages: MutableLiveData<MutableList<Triple<User, Message, Int>>> = MutableLiveData<MutableList<Triple<User, Message, Int>>>()
 
 
@@ -28,12 +31,12 @@ class ChatsViewModel : ViewModel() {
 
     fun loadKeysAndMessages() {
         listOfUsersAndMessages.value?.clear()
-        database.child(auth.uid!!).child(conversation).addValueEventListener(object : ValueEventListener {
+        database.child(auth.uid!!).child(conversations).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (conversationChild in snapshot.children) {
                     val key = conversationChild.key
                     if (key != null) {
-                        database.child(auth.uid!!).child(conversation).child(key).child(allMessages).addValueEventListener(object : ValueEventListener {
+                        database.child(auth.uid!!).child(conversations).child(key).addValueEventListener(object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 var message: Message? = null
                                 var newMessageCount = 0
@@ -98,7 +101,10 @@ class ChatsViewModel : ViewModel() {
                             }
                         }
                         if (!duplicate) {
-                            listOfUsersAndMessages.value?.add(Triple(User(userId = data.first), data.second!!, data.third))
+                            storage.child(deleteProfilePicture).child(delete_icon).downloadUrl.addOnCompleteListener { task ->
+                                listOfUsersAndMessages.value?.add(Triple(User(userId = data.first, customProfilePictureUri = task.result.toString()), data.second!!, data.third))
+                                listOfUsersAndMessages.value = listOfUsersAndMessages.value
+                            }
                         }
                     }
                     listOfUsersAndMessages.value = listOfUsersAndMessages.value
@@ -112,7 +118,7 @@ class ChatsViewModel : ViewModel() {
     }
 
     fun deleteConversation(userId: String) {
-        database.child(auth.uid!!).child(conversation).child(userId).removeValue().addOnCompleteListener {
+        database.child(auth.uid!!).child(conversations).child(userId).removeValue().addOnCompleteListener {
             loadKeysAndMessages()
         }
     }

@@ -18,7 +18,6 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -29,8 +28,9 @@ private const val topicTemplate = "/topics/"
 class ConversationViewModel(application: Application) : AndroidViewModel(application) {
     private val auth = Firebase.auth
     private val database = FirebaseDatabase.getInstance().reference
-    var messagesList: MutableLiveData<MutableList<Triple<String, Message, Message?>>> = MutableLiveData<MutableList<Triple<String, Message, Message?>>>()
-    var userInfo: MutableLiveData<User?> = MutableLiveData<User?>()
+    private val storage = FirebaseStorage.getInstance().reference
+    var messagesList: MutableLiveData<MutableList<Pair<Message, Message?>>> = MutableLiveData<MutableList<Pair<Message, Message?>>>()
+    var userInfo: MutableLiveData<User> = MutableLiveData<User>()
 
     private lateinit var myUsername: String
 
@@ -60,29 +60,29 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
 
     fun sendMessage(message: Message) {
         val recipientId = message.recipientId!!
-        val key = database.push().key!!
+        val key = message.time.toString()
 
         prepareNotification(message)
         database.apply {
-            child(getMyId()).child(conversation).child(recipientId).child(allMessages).child(key).setValue(message)
-            child(recipientId).child(conversation).child(getMyId()).child(allMessages).child(key).setValue(message)
+            child(getMyId()).child(conversations).child(recipientId).child(key).setValue(message)
+            child(recipientId).child(conversations).child(getMyId()).child(key).setValue(message)
         }
     }
 
     fun loadMessage(chatId: String) {
         messagesList.value?.clear()
-        database.child(getMyId()).child(conversation).child(chatId).child(allMessages).addValueEventListener(object : ValueEventListener {
+        database.child(getMyId()).child(conversations).child(chatId).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
 
                 for (dbChild in snapshot.children) {
                     val message = dbChild.getValue(Message::class.java)
                     var duplicate = false
-                    var itemForRemove: Triple<String, Message, Message?>? = null
+                    var itemForRemove: Pair<Message, Message?>? = null
 
                     if (message != null) {
                         for (item in messagesList.value!!) {
-                            if (item.second.time == message.time) {
-                                if (item.second.seen == message.seen) {
+                            if (item.first.time == message.time) {
+                                if (item.first.seen == message.seen) {
                                     duplicate = true
                                 } else {
                                     itemForRemove = item
@@ -92,14 +92,15 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
                         messagesList.value?.remove(itemForRemove)
                         if (!duplicate) {
                             var repliedToMessage: Message? = null
-                            if(message.repliedTo != null) {
-                                for (i in messagesList.value!!) {
-                                    if(i.second.time == message.repliedTo) {
-                                        repliedToMessage = i.second
+                            if (message.repliedTo != null) {
+                                for (item in messagesList.value!!) {
+                                    if (item.first.time == message.repliedTo) {
+                                        repliedToMessage = item.first
                                     }
                                 }
                             }
-                            messagesList.value?.add(Triple(dbChild.key!!, message, repliedToMessage))
+
+                            messagesList.value?.add(Pair(message, repliedToMessage))
                         }
                     }
                 }
@@ -114,16 +115,20 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
 
 
     fun loadUserInfo(userId: String) {
-        userInfo.value = null
+
         database.addValueEventListener(object : ValueEventListener {
             @SuppressLint("NullSafeMutableLiveData")
             override fun onDataChange(snapshot: DataSnapshot) {
-
                 for (dbChild in snapshot.children) {
                     val user = dbChild.child(userInformation).getValue(User::class.java)
                     if (user?.userId == userId) {
                         userInfo.value = user
+                        userInfo.value = userInfo.value
+                        return
                     }
+                }
+                storage.child(deleteProfilePicture).child(delete_icon).downloadUrl.addOnCompleteListener { task ->
+                    userInfo.value = User(customProfilePictureUri = task.result.toString())
                 }
                 userInfo.value = userInfo.value
             }
@@ -132,6 +137,10 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
                 Log.d("TAG", error.toString())
             }
         })
+    }
+
+    fun clearUserInfo() {
+        userInfo.value = null
     }
 
     fun getMyId(): String {
@@ -183,13 +192,14 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
     }
 
 
-    fun editMessage(recipientId: String, editedText: String, messageKey: String, message: Message) {
+    fun editMessage(recipientId: String, editedText: String, message: Message) {
         val update = mapOf("text" to editedText, "edited" to true)
+        val messageKey = message.time.toString()
 
-        database.child(recipientId).child(conversation).child(getMyId()).child(allMessages).addListenerForSingleValueEvent(object : ValueEventListener {
+        database.child(recipientId).child(conversations).child(getMyId()).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.hasChild(messageKey)) {
-                    database.child(recipientId).child(conversation).child(getMyId()).child(allMessages).child(messageKey).updateChildren(update)
+                    database.child(recipientId).child(conversations).child(getMyId()).child(messageKey).updateChildren(update)
                     val newMessage = Message(text = editedText, message.time, message.recipientId, message.seen, message.edited, message.repliedTo)
                     prepareNotification(newMessage, editThisMessage)
                 }
@@ -200,25 +210,17 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
             }
 
         })
-        database.child(getMyId()).child(conversation).child(recipientId).child(allMessages).child(messageKey).updateChildren(update)
+        database.child(getMyId()).child(conversations).child(recipientId).child(messageKey).updateChildren(update)
     }
 
-    fun deleteMessage(messageKey: String, deleteAlsoForAnotherUser: Boolean?, message: Message) {
+    fun deleteMessage(deleteAlsoForAnotherUser: Boolean?, message: Message) {
+        val messageKey = message.time.toString()
+
         if (deleteAlsoForAnotherUser == true) {
-            database.child(userInfo.value?.userId!!).child(conversation).child(getMyId()).child(allMessages).child(messageKey).removeValue()
+            database.child(userInfo.value?.userId!!).child(conversations).child(getMyId()).child(messageKey).removeValue()
             prepareNotification(message, deleteThisMessage)
         }
-        database.child(getMyId()).child(conversation).child(userInfo.value?.userId!!).child(allMessages).child(messageKey).removeValue()
-    }
-
-
-    fun getCurrentProfilePictureStorageRef(): StorageReference {
-        val storageReference = if (userInfo.value?.customProfilePicture == true) {
-            FirebaseStorage.getInstance().reference.child(userInfo.value?.userId!!).child(customProfilePicture)
-        } else {
-            FirebaseStorage.getInstance().reference.child(defaultProfilePicture).child(default_icon)
-        }
-        return storageReference
+        database.child(getMyId()).child(conversations).child(userInfo.value?.userId!!).child(messageKey).removeValue()
     }
 }
 

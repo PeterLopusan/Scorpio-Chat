@@ -6,30 +6,18 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.scorpiochat.customProfilePicture
 import com.example.scorpiochat.data.User
 import com.example.scorpiochat.databinding.SearchingResultsAdapterBinding
-import com.example.scorpiochat.defaultProfilePicture
-import com.example.scorpiochat.default_icon
-import com.google.firebase.storage.FirebaseStorage
 
-class SearchingResultsAdapter(private val onItemClicked: (User) -> Unit): ListAdapter<User, SearchingResultsAdapter.SearchingResultsHolder>(DiffCallbackSearchingResults) {
+class SearchingResultsAdapter(private val onItemClicked: (User) -> Unit) : ListAdapter<User, SearchingResultsAdapter.SearchingResultsHolder>(DiffCallbackSearchingResults) {
 
-    inner class SearchingResultsHolder(private val binding: SearchingResultsAdapterBinding): RecyclerView.ViewHolder(binding.root) {
-        fun setSearchingResult (user: User) {
+    inner class SearchingResultsHolder(private val binding: SearchingResultsAdapterBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun setSearchingResult(user: User) {
             binding.txtUsername.text = user.username
+            Glide.with(binding.root.context)
+                .load(user.customProfilePictureUri)
+                .into(binding.imgProfilePicture)
 
-            val storageReference = if(user.customProfilePicture == true) {
-                FirebaseStorage.getInstance().reference.child(user.userId!!).child(customProfilePicture)
-            } else {
-                FirebaseStorage.getInstance().reference.child(defaultProfilePicture).child(default_icon)
-            }
-
-            storageReference.downloadUrl.addOnCompleteListener { task ->
-                Glide.with(binding.root.context)
-                    .load(task.result)
-                    .into(binding.imgProfilePicture)
-            }
         }
     }
 

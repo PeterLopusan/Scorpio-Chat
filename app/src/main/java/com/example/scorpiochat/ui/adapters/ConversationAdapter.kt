@@ -19,18 +19,17 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 
-class ConversationAdapter(val myId: String, val chatId: String, private val onItemLongClick: (Triple<String, Message, View>) -> Unit, val clickToScroll: (Long) -> Unit) :
-    ListAdapter<Triple<String, Message, Message?>, ConversationAdapter.ConversationHolder>(DiffCallbackConversation) {
+class ConversationAdapter(val myId: String, val chatId: String, private val onItemLongClick: (Pair<Message, View>) -> Unit, val clickToScroll: (Long) -> Unit) :
+    ListAdapter<Pair<Message, Message?>, ConversationAdapter.ConversationHolder>(DiffCallbackConversation) {
 
     private var previousItem: ConversationAdapterBinding? = null
     private var previousDate = ""
     private var previousPosition = -1
 
     inner class ConversationHolder(private val binding: ConversationAdapterBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun setMessageValues(data: Triple<String, Message, Message?>, itemPosition: Int) {
-            val key = data.first
-            val message = data.second
-            val repliedToMessage = data.third
+        fun setMessageValues(data: Pair<Message, Message?>, itemPosition: Int) {
+            val message = data.first
+            val repliedToMessage = data.second
 
             binding.layoutLinkedMessage.setOnClickListener {
                 if(repliedToMessage !=null) {
@@ -68,7 +67,7 @@ class ConversationAdapter(val myId: String, val chatId: String, private val onIt
                     backgroundColor = context.getColor(R.color.purple_500)
                     timeAndSeen = getTime(message.time!!, context)
                     if (message.seen == false) {
-                        makeMessageSeen(key)
+                        makeMessageSeen(message.time.toString())
                     }
                 } else {
                     layoutMessageRow.gravity = Gravity.END
@@ -128,10 +127,10 @@ class ConversationAdapter(val myId: String, val chatId: String, private val onIt
         private fun makeMessageSeen(messageKey: String) {
             val database = FirebaseDatabase.getInstance().reference
             val update = mapOf("seen" to true)
-            database.child(chatId).child(conversation).child(myId).child(allMessages).addListenerForSingleValueEvent(object : ValueEventListener {
+            database.child(chatId).child(conversations).child(myId).addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.hasChild(messageKey)) {
-                        database.child(chatId).child(conversation).child(myId).child(allMessages).child(messageKey).updateChildren(update)
+                        database.child(chatId).child(conversations).child(myId).child(messageKey).updateChildren(update)
                     }
                 }
 
@@ -140,7 +139,7 @@ class ConversationAdapter(val myId: String, val chatId: String, private val onIt
                 }
 
             })
-            database.child(myId).child(conversation).child(chatId).child(allMessages).child(messageKey).updateChildren(update)
+            database.child(myId).child(conversations).child(chatId).child(messageKey).updateChildren(update)
         }
     }
 
@@ -152,18 +151,18 @@ class ConversationAdapter(val myId: String, val chatId: String, private val onIt
     override fun onBindViewHolder(holder: ConversationAdapter.ConversationHolder, position: Int) {
         holder.setMessageValues(getItem(position), holder.adapterPosition)
         holder.itemView.setOnLongClickListener {
-            onItemLongClick(Triple(getItem(position).first, getItem(position).second, it))
+            onItemLongClick(Pair(getItem(position).first, it))
             true
         }
     }
 
-    companion object DiffCallbackConversation : DiffUtil.ItemCallback<Triple<String, Message, Message?>>() {
-        override fun areItemsTheSame(oldItem: Triple<String, Message, Message?>, newItem: Triple<String, Message, Message?>): Boolean {
-            return oldItem.second.time == newItem.second.time
+    companion object DiffCallbackConversation : DiffUtil.ItemCallback<Pair<Message, Message?>>() {
+        override fun areItemsTheSame(oldItem: Pair<Message, Message?>, newItem: Pair<Message, Message?>): Boolean {
+            return oldItem.first.time == newItem.first.time
         }
 
-        override fun areContentsTheSame(oldItem: Triple<String, Message, Message?>, newItem: Triple<String, Message, Message?>): Boolean {
-            return oldItem.second.time == newItem.second.time
+        override fun areContentsTheSame(oldItem: Pair<Message, Message?>, newItem: Pair<Message, Message?>): Boolean {
+            return oldItem.first.time == newItem.first.time
         }
     }
 }

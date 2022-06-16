@@ -35,7 +35,7 @@ class ComponentSetProfilePicture @JvmOverloads constructor(context: Context, att
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageBitmap = result.data?.extras?.get("data") as Bitmap
                 val uri = getImageUri(imageBitmap, context)
-                setProfilePictureFromUri(uri)
+                setProfilePictureFromUri(uri, fragment.requireContext())
                 setProfilePictureUri(uri)
             }
         }
@@ -51,11 +51,11 @@ class ComponentSetProfilePicture @JvmOverloads constructor(context: Context, att
                 } else {
                     ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, data?.data!!))
                 }
-                val resizedBitmap = getResizedBitmap(imageBitmap, 500)
+                val resizedBitmap = getResizedBitmap(imageBitmap, 1000)
 
                 if (resizedBitmap != null) {
                     val uri = getImageUri(resizedBitmap, context)
-                    setProfilePictureFromUri(uri)
+                    setProfilePictureFromUri(uri, fragment.requireContext())
                     setProfilePictureUri(uri)
                 }
             }
@@ -64,7 +64,8 @@ class ComponentSetProfilePicture @JvmOverloads constructor(context: Context, att
     }
 
 
-    fun setProfilePictureFromUri(uri: Uri?) {
+    fun setProfilePictureFromUri(uri: Uri?, context: Context) {
+
 
         Glide.with(context)
             .load(uri)
@@ -76,12 +77,12 @@ class ComponentSetProfilePicture @JvmOverloads constructor(context: Context, att
         profilePicture = uri
     }
 
-    private fun changePictureSize (large: Boolean) {
+    private fun changePictureSize(large: Boolean) {
         val parameters = binding.imgProfilePicture.layoutParams
         var width = parameters.width
         var heigh = parameters.height
 
-        if(large) {
+        if (large) {
             width /= 2
             heigh /= 2
         } else {

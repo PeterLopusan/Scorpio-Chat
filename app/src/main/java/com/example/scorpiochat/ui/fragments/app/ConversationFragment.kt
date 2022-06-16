@@ -52,19 +52,19 @@ class ConversationFragment : Fragment() {
         }
 
 
-        val onItemLongClick: ((Triple<String, Message, View>) -> Unit) = {
+        val onItemLongClick: ((Pair<Message, View>) -> Unit) = {
             showPopupMenu(it)
         }
 
         val clickToScroll: (Long) -> Unit = {
             for ((index, item) in viewModel.messagesList.value!!.withIndex()) {
-                if (item.second.time == it) {
+                if (item.first.time == it) {
                     binding.recyclerMessages.scrollToPosition(index)
                 }
             }
         }
         val recyclerAdapter = ConversationAdapter(viewModel.getMyId(), navigationArgs.userId, onItemLongClick, clickToScroll)
-        val previousUserMessageList: MutableList<Triple<String, Message, Message?>> = mutableListOf()
+        val previousUserMessageList: MutableList<Pair<Message, Message?>> = mutableListOf()
 
         binding.recyclerMessages.adapter = recyclerAdapter
         viewModel.messagesList.observe(viewLifecycleOwner) { it ->
@@ -83,7 +83,9 @@ class ConversationFragment : Fragment() {
         }
 
         viewModel.userInfo.observe(viewLifecycleOwner) {
-            setUserInformation(it)
+            if(it!= null) {
+                setUserInformation(it)
+            }
             viewModel.loadMessage(navigationArgs.userId)
         }
 
@@ -92,7 +94,7 @@ class ConversationFragment : Fragment() {
         }
     }
 
-    private fun setUserInformation(user: User?) {
+    private fun setUserInformation(user: User) {
         val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
         val context = requireContext()
         val title = requireActivity().findViewById<TextView>(R.id.txt_toolbar_title)
@@ -102,13 +104,15 @@ class ConversationFragment : Fragment() {
         requireActivity().findViewById<LinearLayout>(R.id.layout_toolbar_user_info).visibility = View.VISIBLE
         actionBar?.setDisplayShowTitleEnabled(false)
 
-        viewModel.getCurrentProfilePictureStorageRef().downloadUrl.addOnCompleteListener { task ->
-            Glide.with(context)
-                .load(task.result)
-                .into(profileIcon)
-        }
 
-        if (user != null) {
+        Glide.with(context)
+            .load(user.customProfilePictureUri)
+            .placeholder(R.drawable.loading_animation)
+            .error(R.drawable.loading_animation)
+            .into(profileIcon)
+
+
+        if (user.username != null) {
             title.text = user.username
             binding.layoutSendMessage.visibility = View.VISIBLE
 
@@ -144,11 +148,10 @@ class ConversationFragment : Fragment() {
     }
 
 
-    private fun showPopupMenu(data: Triple<String, Message, View>) {
+    private fun showPopupMenu(data: Pair<Message, View>) {
         val context = requireContext()
-        val key = data.first
-        val message = data.second
-        val view = data.third
+        val message = data.first
+        val view = data.second
         val isNotMyMessage = message.recipientId == viewModel.getMyId()
         val popupMenu = PopupMenu(context, view, Gravity.END)
 
@@ -178,10 +181,10 @@ class ConversationFragment : Fragment() {
                         forwardMessage(message)
                     }
                     R.id.header_edit -> {
-                        editMessage(message, key)
+                        editMessage(message)
                     }
                     R.id.header_delete -> {
-                        deleteMessage(key, isNotMyMessage, message)
+                        deleteMessage(isNotMyMessage, message)
                     }
                 }
                 true
@@ -197,7 +200,7 @@ class ConversationFragment : Fragment() {
         Toast.makeText(requireContext(), requireContext().getString(R.string.copied_to_clipboard), Toast.LENGTH_SHORT).show()
     }
 
-    private fun deleteMessage(messageKey: String, isNotMyMessage: Boolean, message: Message) {
+    private fun deleteMessage(isNotMyMessage: Boolean, message: Message) {
         val context = requireContext()
         val checkBox: CheckBox? = if (isNotMyMessage || viewModel.userInfo.value?.username == null) {
             null
@@ -210,7 +213,7 @@ class ConversationFragment : Fragment() {
             .setTitle(context.getString(R.string.are_you_sure))
             .setView(checkBox)
             .setPositiveButton(context.getString(R.string.confirm)) { _, _ ->
-                viewModel.deleteMessage(messageKey, checkBox?.isChecked, message)
+                viewModel.deleteMessage(checkBox?.isChecked, message)
             }
             .setNegativeButton(context.getString(R.string.cancel), null)
             .create()
@@ -272,13 +275,13 @@ class ConversationFragment : Fragment() {
         }
     }
 
-    private fun editMessage(message: Message, messageKey: String) {
+    private fun editMessage(message: Message) {
         showActionWindow(message, Action.EDIT)
         binding.btnEditMessage.setOnClickListener {
             val editedText = binding.editTextSendMessage.text.toString()
 
             if (editedText.isNotBlank() && editedText != message.text) {
-                viewModel.editMessage(message.recipientId!!, editedText, messageKey, message)
+                viewModel.editMessage(message.recipientId!!, editedText, message)
                 hideActionWindow(Action.EDIT)
             } else if (editedText == message.text) {
                 hideActionWindow(Action.EDIT)
@@ -292,6 +295,7 @@ class ConversationFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
+        viewModel.clearUserInfo()
         requireActivity().apply {
             findViewById<de.hdodenhof.circleimageview.CircleImageView>(R.id.img_toolbar_profile_icon).setBackgroundResource(R.drawable.loading_animation)
             findViewById<LinearLayout>(R.id.layout_toolbar_user_info).visibility = View.GONE

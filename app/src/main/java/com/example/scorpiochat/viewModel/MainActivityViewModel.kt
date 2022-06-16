@@ -12,14 +12,11 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import androidx.lifecycle.map
 
 class MainActivityViewModel : ViewModel() {
     private val auth = Firebase.auth
     private val database = FirebaseDatabase.getInstance().reference
-    private val storage = FirebaseStorage.getInstance().reference
     var userInfo: MutableLiveData<User> = MutableLiveData<User>()
 
     val authenticationState = FirebaseUserLiveData().map {
@@ -37,7 +34,7 @@ class MainActivityViewModel : ViewModel() {
                 for (dbChild in snapshot.children) {
                     val user = dbChild.child(userInformation).getValue(User::class.java)
                     if (user?.userId == auth.uid && user!=null) {
-                        userInfo.value = user!!
+                        userInfo.value = user
                         return
                     }
                 }
@@ -51,16 +48,6 @@ class MainActivityViewModel : ViewModel() {
 
     fun getUserEmail(): String {
         return auth.currentUser!!.email!!
-    }
-
-    fun getStorage(): StorageReference {
-        val storageReference = if (userInfo.value?.customProfilePicture == true) {
-            storage.child(userInfo.value?.userId!!).child(customProfilePicture)
-        } else {
-            storage.child(defaultProfilePicture).child(default_icon)
-        }
-
-        return storageReference
     }
 
     fun changeUserStatus(isOnline: Boolean) {
