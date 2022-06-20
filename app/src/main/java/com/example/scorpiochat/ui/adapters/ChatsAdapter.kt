@@ -64,6 +64,12 @@ class ChatsAdapter(
                     txtNewMessageCount.visibility = View.GONE
                 }
 
+                if(user.userId?.let { SharedPreferencesManager.getIfUserIsMuted(context, it) } == true) {
+                    imgMute.visibility = View.VISIBLE
+                } else {
+                    imgMute.visibility = View.GONE
+                }
+
                 if (getDate(message.time!!, context) == getDate(System.currentTimeMillis(), context)) {
                     txtTime.text = getTime(message.time, context)
                 } else {

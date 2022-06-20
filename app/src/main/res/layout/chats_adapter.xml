@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="5dp"
         android:orientation="vertical"
-        app:layout_constraintEnd_toStartOf="@+id/txt_time"
+        app:layout_constraintEnd_toStartOf="@+id/img_mute"
         app:layout_constraintStart_toEndOf="@id/img_profile_picture"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -43,7 +43,7 @@
             android:layout_height="match_parent"
             android:textSize="20sp"
             android:textStyle="bold"
-            tools:text="Peter Lopušan" />
+            tools:text="Peter" />
 
         <TextView
             android:id="@+id/txt_message"
@@ -54,6 +54,17 @@
             android:textStyle="italic"
             tools:text="Hello. How are you?" />
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/img_mute"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_marginHorizontal="5dp"
+        android:src="@drawable/ic_baseline_volume_off_24"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/txt_time"
+        app:layout_constraintEnd_toStartOf="@id/txt_time"
+        app:layout_constraintTop_toTopOf="@id/txt_time" />
 
     <TextView
         android:id="@+id/txt_time"

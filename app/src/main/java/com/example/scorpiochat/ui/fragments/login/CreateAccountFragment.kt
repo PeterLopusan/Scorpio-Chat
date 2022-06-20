@@ -26,7 +26,7 @@ class CreateAccountFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         loginViewModel.getStorageWithDefaultPictureImage().downloadUrl.addOnCompleteListener { task ->
-            binding.componentSetProfilePicture.setProfilePictureFromUri(task.result, requireContext())
+            binding.componentSetProfilePicture.setProfilePictureFromUri(task.result)
         }
 
         binding.apply {
@@ -63,7 +63,7 @@ class CreateAccountFragment : Fragment() {
     private fun deleteCustomPicture() {
         loginViewModel.getStorageWithDefaultPictureImage().downloadUrl.addOnCompleteListener { task ->
             binding.componentSetProfilePicture.apply {
-                setProfilePictureFromUri(task.result, requireContext())
+                setProfilePictureFromUri(task.result)
                 setProfilePictureUri(null)
             }
         }

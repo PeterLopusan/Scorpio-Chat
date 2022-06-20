@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="5dp"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/txt_alert_dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_margin="5dp"
+        android:text="@string/mute"
+        android:textSize="25sp"
+        android:textStyle="bold|italic" />
+
+    <RadioGroup
+        android:id="@+id/radio_group_mute"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/radio_btn_15_minutes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/fifteen_minutes" />
+
+        <RadioButton
+            android:id="@+id/radio_btn_1_hour"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/one_hour" />
+
+        <RadioButton
+            android:id="@+id/radio_btn_8_hours"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/eight_hours" />
+
+        <RadioButton
+            android:id="@+id/radio_btn_permanently"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/permanently" />
+    </RadioGroup>
+</LinearLayout>

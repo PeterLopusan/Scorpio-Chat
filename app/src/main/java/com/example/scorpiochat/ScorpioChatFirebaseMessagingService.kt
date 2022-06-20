@@ -57,25 +57,26 @@ class ScorpioChatFirebaseMessagingService : FirebaseMessagingService() {
 
 
     private fun sendNotification(messageText: String, userName: String, senderId: String, time: Int?) {
+        if (!SharedPreferencesManager.getIfUserIsMuted(applicationContext, senderId)) {
+            val pendingIntent = NavDeepLinkBuilder(applicationContext)
+                .setComponentName(MainActivity::class.java)
+                .setGraph(R.navigation.mobile_navigation)
+                .setDestination(R.id.conversationFragment)
+                .setArguments(bundleOf("userId" to senderId))
+                .createPendingIntent()
 
-        val pendingIntent = NavDeepLinkBuilder(applicationContext)
-            .setComponentName(MainActivity::class.java)
-            .setGraph(R.navigation.mobile_navigation)
-            .setDestination(R.id.conversationFragment)
-            .setArguments(bundleOf("userId" to senderId))
-            .createPendingIntent()
+            val builder = NotificationCompat.Builder(applicationContext, channelId)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(userName)
+                .setContentText(messageText)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(messageText))
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
 
-        val builder = NotificationCompat.Builder(applicationContext, channelId)
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle(userName)
-            .setContentText(messageText)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(messageText))
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-
-        with(NotificationManagerCompat.from(applicationContext)) {
-            notify(time!!, builder.build())
+            with(NotificationManagerCompat.from(applicationContext)) {
+                notify(time!!, builder.build())
+            }
         }
     }
 

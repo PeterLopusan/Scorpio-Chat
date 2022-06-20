@@ -25,4 +25,14 @@ object SharedPreferencesManager {
         val sharedPref = context.getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE)
         sharedPref.edit().putBoolean(context.getString(R.string.shared_pref_dark_theme), darkTheme).apply()
     }
+
+    fun getIfUserIsMuted(context: Context, userId: String): Boolean {
+        val sharedPref = context.getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE)
+        return sharedPref.getBoolean(userId, false)
+    }
+
+    fun setIfUserIsMuted(context: Context, muteUser: Boolean, userId: String) {
+        val sharedPref = context.getSharedPreferences(sharedPrefName, Context.MODE_PRIVATE)
+        sharedPref.edit().putBoolean(userId, muteUser).apply()
+    }
 }

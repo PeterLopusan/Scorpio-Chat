@@ -1,14 +1,13 @@
 package com.example.scorpiochat.viewModel
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.scorpiochat.conversations
+import androidx.work.*
+import com.example.scorpiochat.*
 import com.example.scorpiochat.data.Message
 import com.example.scorpiochat.data.User
-import com.example.scorpiochat.deleteProfilePicture
-import com.example.scorpiochat.delete_icon
-import com.example.scorpiochat.userInformation
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -16,6 +15,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import java.util.concurrent.TimeUnit
 
 class ChatsViewModel : ViewModel() {
     private val auth = Firebase.auth
@@ -42,7 +42,7 @@ class ChatsViewModel : ViewModel() {
                                 var newMessageCount = 0
                                 for (messageChild in snapshot.children) {
                                     message = messageChild.getValue(Message::class.java)
-                                    if(message?.seen == false && message.recipientId == getMyId()) {
+                                    if (message?.seen == false && message.recipientId == getMyId()) {
                                         newMessageCount++
                                     }
                                 }
@@ -66,7 +66,7 @@ class ChatsViewModel : ViewModel() {
 
 
     private fun loadUsers(data: Triple<String, Message?, Int>) {
-        if(data.second != null) {
+        if (data.second != null) {
             database.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     var match = false
@@ -121,6 +121,27 @@ class ChatsViewModel : ViewModel() {
         database.child(auth.uid!!).child(conversations).child(userId).removeValue().addOnCompleteListener {
             loadKeysAndMessages()
         }
+    }
+
+    fun muteConversation(context: Context, userId: String, duration: Long? = null) {
+        SharedPreferencesManager.setIfUserIsMuted(context, true, userId)
+        if (duration != null) {
+            val data = Data.Builder()
+            data.putString("userId", userId)
+            val request: OneTimeWorkRequest =
+                OneTimeWorkRequest.Builder(UnmuteUserWorker::class.java)
+                    .setInitialDelay(duration, TimeUnit.MINUTES)
+                    .setInputData(data.build())
+                    .build()
+            WorkManager.getInstance(context).enqueueUniqueWork(userId, ExistingWorkPolicy.REPLACE, request)
+        }
+        loadKeysAndMessages()
+    }
+
+    fun unmuteConversation(context: Context, userId: String) {
+        SharedPreferencesManager.setIfUserIsMuted(context, false, userId)
+        WorkManager.getInstance(context).cancelUniqueWork(userId)
+        loadKeysAndMessages()
     }
 
     fun getMyId(): String {

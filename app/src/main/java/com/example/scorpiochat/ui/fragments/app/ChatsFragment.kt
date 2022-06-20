@@ -12,8 +12,10 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.scorpiochat.R
+import com.example.scorpiochat.SharedPreferencesManager
 import com.example.scorpiochat.data.Message
 import com.example.scorpiochat.data.User
+import com.example.scorpiochat.databinding.AlertDialogMuteConversationLayoutBinding
 import com.example.scorpiochat.databinding.FragmentChatsBinding
 import com.example.scorpiochat.ui.activities.MainActivity
 import com.example.scorpiochat.ui.adapters.ChatsAdapter
@@ -83,11 +85,18 @@ class ChatsFragment : Fragment() {
         val user = data.first
         val view = data.second
         val popupMenu = PopupMenu(context, view, Gravity.END)
-
         val username: String = user.username ?: context.getString(R.string.deleted_user)
+
         popupMenu.apply {
             menu.add(Menu.NONE, -1, 0, username).apply { isEnabled = false }
             inflate(R.menu.menu_chats)
+
+            if(user.userId?.let { SharedPreferencesManager.getIfUserIsMuted(context, it) } == true) {
+                menu.findItem(R.id.header_mute).isVisible = false
+            } else {
+                menu.findItem(R.id.header_unmute).isVisible = false
+            }
+
             setForceShowIcon(true)
             setOnMenuItemClickListener { item: MenuItem? ->
                 when (item!!.itemId) {
@@ -95,7 +104,10 @@ class ChatsFragment : Fragment() {
                         showAlertDialog { viewModel.deleteConversation(user.userId!!) }
                     }
                     R.id.header_mute -> {
-                        showAlertDialog { Toast.makeText(context, "header2", Toast.LENGTH_SHORT).show() }
+                        muteConversation(user.userId!!)
+                    }
+                    R.id.header_unmute -> {
+                        user.userId?.let { viewModel.unmuteConversation(context, it) }
                     }
                     R.id.header_block -> {
                         showAlertDialog { Toast.makeText(context, "header3", Toast.LENGTH_SHORT).show() }
@@ -120,4 +132,35 @@ class ChatsFragment : Fragment() {
             .create()
             .show()
     }
+
+    private fun muteConversation(userId: String) {
+        val context = requireContext()
+        val alertDialogBinding = activity?.layoutInflater?.let { AlertDialogMuteConversationLayoutBinding.inflate(it) }
+
+
+        AlertDialog.Builder(context)
+            .setView(alertDialogBinding?.root)
+            .setPositiveButton(context.getString(R.string.confirm)) { _, _ ->
+                when (alertDialogBinding?.radioGroupMute?.checkedRadioButtonId) {
+                    alertDialogBinding?.radioBtn15Minutes?.id -> {
+                        viewModel.muteConversation(context, userId, 15)
+                    }
+                    alertDialogBinding?.radioBtn1Hour?.id -> {
+                        viewModel.muteConversation(context, userId, 60)
+                    }
+                    alertDialogBinding?.radioBtn8Hours?.id -> {
+                        viewModel.muteConversation(context, userId, 480)
+                    }
+                    alertDialogBinding?.radioBtnPermanently?.id -> {
+                        viewModel.muteConversation(context, userId)
+                    }
+                }
+
+            }
+            .setNegativeButton(context.getString(R.string.cancel), null)
+            .create()
+            .show()
+    }
+
+
 }

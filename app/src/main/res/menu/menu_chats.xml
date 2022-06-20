@@ -7,8 +7,14 @@
         android:title="@string/delete" />
     <item
         android:id="@+id/header_mute"
-        android:icon="@drawable/ic_baseline_volume_mute_24"
+        android:icon="@drawable/ic_baseline_volume_off_24"
         android:title="@string/mute" />
+
+    <item
+        android:id="@+id/header_unmute"
+        android:icon="@drawable/ic_baseline_volume_up_24"
+        android:title="@string/unmute" />
+
     <item
         android:id="@+id/header_block"
         android:icon="@drawable/ic_baseline_block_24"

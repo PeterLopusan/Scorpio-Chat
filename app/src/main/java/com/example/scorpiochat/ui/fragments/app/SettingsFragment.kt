@@ -39,7 +39,7 @@ class SettingsFragment : Fragment() {
             btnDelete.setOnClickListener {
                 viewModel.getDefaultProfilePictureStorageRef().downloadUrl.addOnCompleteListener { task ->
                     binding.componentSetProfilePicture.apply {
-                        setProfilePictureFromUri(task.result, context)
+                        setProfilePictureFromUri(task.result)
                         setProfilePictureUri(null)
                     }
                 }
@@ -68,7 +68,7 @@ class SettingsFragment : Fragment() {
         }
 
         viewModel.userInfo.observe(viewLifecycleOwner) {
-            binding.componentSetProfilePicture.setProfilePictureFromUri(viewModel.userInfo.value?.customProfilePictureUri?.toUri(), requireContext())
+            binding.componentSetProfilePicture.setProfilePictureFromUri(viewModel.userInfo.value?.customProfilePictureUri?.toUri())
         }
     }
 
@@ -82,33 +82,32 @@ class SettingsFragment : Fragment() {
 
     private fun changeUsername() {
         val context = requireContext()
-        val title = context.getString(R.string.change_username)
         val alertDialogBinding = activity?.layoutInflater?.let { AlertDialogLayoutBinding.inflate(it) }
         val function = {viewModel.changeUsername(alertDialogBinding?.editTxtAlertDialog?.text.toString())}
 
         alertDialogBinding?.apply {
             editTxtAlertDialog.setText(viewModel.userInfo.value?.username ?: return)
             editTxtPassword.visibility = View.GONE
+            txtAlertDialogTitle.text = context.getString(R.string.change_username)
         }
 
-        showAlertDialog(title,alertDialogBinding, function)
+        showAlertDialog(alertDialogBinding = alertDialogBinding, function =  function)
     }
 
     private fun changeEmail() {
         val context = requireContext()
-        val title = context.getString(R.string.change_email)
         val alertDialogBinding = activity?.layoutInflater?.let { AlertDialogLayoutBinding.inflate(it) }
 
         alertDialogBinding?.apply {
             editTxtAlertDialog.setText(viewModel.getUserEmail())
-
+            txtAlertDialogTitle.text = context.getString(R.string.change_email)
         }
 
         val newEmail = alertDialogBinding?.editTxtAlertDialog?.text.toString()
         val password = alertDialogBinding?.editTxtPassword?.text.toString()
         val function = { viewModel.changeEmail(newEmail, password, context) }
 
-        showAlertDialog(title, alertDialogBinding, function)
+        showAlertDialog(alertDialogBinding = alertDialogBinding, function = function)
     }
 
     private fun signOut() {
@@ -121,16 +120,17 @@ class SettingsFragment : Fragment() {
 
     private fun deleteAccount() {
         val context = requireContext()
-        val title = context.getString(R.string.delete_account)
+
         val alertDialogBinding = activity?.layoutInflater?.let { AlertDialogLayoutBinding.inflate(it) }
         val function = {viewModel.deleteAccount(alertDialogBinding?.editTxtPassword?.text.toString(), context)}
 
         alertDialogBinding?.editTxtAlertDialog?.visibility = View.GONE
-        showAlertDialog(title, alertDialogBinding, function)
+        alertDialogBinding?.txtAlertDialogTitle?.text = context.getString(R.string.delete_account)
+        showAlertDialog(alertDialogBinding = alertDialogBinding, function = function)
     }
 
 
-    private fun showAlertDialog(title: String, alertDialogBinding: AlertDialogLayoutBinding? = null, function: () -> Unit) {
+    private fun showAlertDialog(title: String? = null, alertDialogBinding: AlertDialogLayoutBinding? = null, function: () -> Unit) {
         val context = requireContext()
 
         AlertDialog.Builder(context)

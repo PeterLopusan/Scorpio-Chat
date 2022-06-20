@@ -71,7 +71,11 @@
     <string name="forwarded_text">Preposlaný text:</string>
     <string name="replied">Odpovedané:</string>
     <string name="forwarded">Preposlané:</string>
-
+    <string name="fifteen_minutes">15 minút</string>
+    <string name="one_hour">1 hodina</string>
+    <string name="eight_hours">8 hodín</string>
+    <string name="permanently">Natrvalo</string>
+    <string name="unmute">Zapnúť upozornenia</string>
 
 
     <string name="shared_pref_topic">Topic</string>

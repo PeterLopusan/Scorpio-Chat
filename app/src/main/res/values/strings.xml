@@ -71,7 +71,11 @@
     <string name="forwarded_text">Edited text:</string>
     <string name="replied">Replied:</string>
     <string name="forwarded">Forwarded:</string>
-
+    <string name="fifteen_minutes">15 minutes</string>
+    <string name="one_hour">1 hour</string>
+    <string name="eight_hours">8 hours</string>
+    <string name="permanently">Permanently</string>
+    <string name="unmute">Unmute</string>
 
 
     <string name="shared_pref_topic">Topic</string>

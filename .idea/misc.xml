@@ -4,8 +4,12 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/plopusan/.gradle/caches/transforms-3/c7cf9c1bfc3d0e4d0642946affdf4e16/transformed/appcompat-1.4.1/res/drawable/abc_ic_ab_back_material.xml" value="0.368" />
+        <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/drawable/ic_baseline_delete_forever_24.xml" value="0.2355" />
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/drawable/ic_baseline_reply_24.xml" value="0.1965" />
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/drawable/ic_baseline_rotate_right_24.xml" value="0.1965" />
+        <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/drawable/ic_baseline_turn_left_24.xml" value="0.2355" />
+        <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/drawable/ic_baseline_volume_off_24.xml" value="0.2355" />
+        <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/drawable/ic_baseline_volume_up_24.xml" value="0.2355" />
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/drawable/ic_menu_gallery.xml" value="0.1495" />
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/drawable/loading_img.xml" value="0.1" />
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/drawable/menu_chats.xml" value="0.1115" />
@@ -18,6 +22,8 @@
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/drawable/transparent_circle_background.xml" value="0.2535" />
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/layout/activity_login.xml" value="0.3671875" />
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/layout/activity_main.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/layout/alert_dialog_layout.xml" value="0.1796875" />
+        <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/layout/alert_dialog_mute_conversation_layout.xml" value="0.1" />
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/layout/app_bar_main.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/layout/change_email_alert_dialog_layout.xml" value="0.3671875" />
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/layout/chats_adapter.xml" value="0.4466666666666667" />
@@ -39,7 +45,7 @@
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/layout/searching_results_adapter.xml" value="0.4466666666666667" />
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/layout/set_profile_picture_component.xml" value="0.22" />
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/menu/activity_main_drawer.xml" value="0.16666666666666666" />
-        <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/menu/menu_chats.xml" value="0.15" />
+        <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/menu/menu_chats.xml" value="0.4466666666666667" />
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/menu/menu_conversation.xml" value="0.3671875" />
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.202" />
         <entry key="..\:/Users/plopusan/AndroidStudioProjects/ScorpioChat/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.202" />

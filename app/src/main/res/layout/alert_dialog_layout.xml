@@ -1,25 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_margin="5dp"
+    android:orientation="vertical"
+    android:padding="15dp">
+
+    <TextView
+        android:id="@+id/txt_alert_dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_margin="5dp"
+        android:textSize="20sp"
+        android:textStyle="bold|italic"
+        tools:text="@string/change_email" />
 
     <EditText
         android:id="@+id/editTxt_alert_dialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:autofillHints="@string/email"
         android:hint="@string/email"
-        android:inputType="textEmailAddress"
-        android:autofillHints="@string/email" />
+        android:inputType="textEmailAddress" />
 
     <EditText
         android:id="@+id/editTxt_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/email"
+        android:autofillHints="@string/email"
+        android:hint="@string/password"
         android:inputType="textPassword"
-        android:text=""
-        android:autofillHints="@string/email" />
-
+        android:text="" />
 
 </LinearLayout>
