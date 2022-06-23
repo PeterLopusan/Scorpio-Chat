@@ -119,6 +119,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun refreshEmailInNavHeader() {
+        binding.navView.getHeaderView(0).findViewById<TextView>(R.id.txt_mail).text = viewModel.getUserEmail()
+    }
+
     private fun setMode() {
         if (SharedPreferencesManager.getDarkTheme(this)) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
