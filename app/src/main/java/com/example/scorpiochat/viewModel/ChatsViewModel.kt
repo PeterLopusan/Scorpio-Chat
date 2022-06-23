@@ -8,6 +8,7 @@ import androidx.work.*
 import com.example.scorpiochat.*
 import com.example.scorpiochat.data.Message
 import com.example.scorpiochat.data.User
+import com.example.scorpiochat.workers.UnmuteUserWorker
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -69,12 +70,10 @@ class ChatsViewModel : ViewModel() {
         if (data.second != null) {
             database.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    var match = false
                     for (dbChild in snapshot.children) {
                         val user = dbChild.child(userInformation).getValue(User::class.java)
 
-                        if (user?.username != null && dbChild.key == data.first) {
-                            match = true
+                        if (user != null && dbChild.key == data.first) {
                             var duplicate = false
                             var itemForRemove: Triple<User, Message, Int>? = null
                             for (item in listOfUsersAndMessages.value!!) {
@@ -90,20 +89,6 @@ class ChatsViewModel : ViewModel() {
                             listOfUsersAndMessages.value?.remove(itemForRemove)
                             if (!duplicate) {
                                 listOfUsersAndMessages.value?.add(Triple(user, data.second!!, data.third))
-                            }
-                        }
-                    }
-                    if (!match) {
-                        var duplicate = false
-                        for (item in listOfUsersAndMessages.value!!) {
-                            if (item.first.userId == data.first) {
-                                duplicate = true
-                            }
-                        }
-                        if (!duplicate) {
-                            storage.child(deleteProfilePicture).child(delete_icon).downloadUrl.addOnCompleteListener { task ->
-                                listOfUsersAndMessages.value?.add(Triple(User(userId = data.first, customProfilePictureUri = task.result.toString()), data.second!!, data.third))
-                                listOfUsersAndMessages.value = listOfUsersAndMessages.value
                             }
                         }
                     }

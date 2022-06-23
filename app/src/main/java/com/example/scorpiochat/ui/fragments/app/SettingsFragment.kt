@@ -12,6 +12,7 @@ import androidx.fragment.app.viewModels
 import com.example.scorpiochat.R
 import com.example.scorpiochat.databinding.AlertDialogLayoutBinding
 import com.example.scorpiochat.databinding.FragmentSettingsBinding
+import com.example.scorpiochat.ui.activities.MainActivity
 import com.example.scorpiochat.viewModel.SettingsViewModel
 
 
@@ -83,7 +84,7 @@ class SettingsFragment : Fragment() {
     private fun changeUsername() {
         val context = requireContext()
         val alertDialogBinding = activity?.layoutInflater?.let { AlertDialogLayoutBinding.inflate(it) }
-        val function = {viewModel.changeUsername(alertDialogBinding?.editTxtAlertDialog?.text.toString())}
+        val function = { viewModel.changeUsername(alertDialogBinding?.editTxtAlertDialog?.text.toString()) }
 
         alertDialogBinding?.apply {
             editTxtAlertDialog.setText(viewModel.userInfo.value?.username ?: return)
@@ -91,7 +92,7 @@ class SettingsFragment : Fragment() {
             txtAlertDialogTitle.text = context.getString(R.string.change_username)
         }
 
-        showAlertDialog(alertDialogBinding = alertDialogBinding, function =  function)
+        showAlertDialog(alertDialogBinding = alertDialogBinding, function = function)
     }
 
     private fun changeEmail() {
@@ -102,17 +103,21 @@ class SettingsFragment : Fragment() {
             editTxtAlertDialog.setText(viewModel.getUserEmail())
             txtAlertDialogTitle.text = context.getString(R.string.change_email)
         }
-
-        val newEmail = alertDialogBinding?.editTxtAlertDialog?.text.toString()
-        val password = alertDialogBinding?.editTxtPassword?.text.toString()
-        val function = { viewModel.changeEmail(newEmail, password, context) }
+        val activity = (activity as MainActivity?)
+        val function = {
+            viewModel.changeEmail(alertDialogBinding?.editTxtAlertDialog?.text.toString(), alertDialogBinding?.editTxtPassword?.text.toString(), context).observe(viewLifecycleOwner) {
+                if (it == true) {
+                    (activity as MainActivity).refreshEmailInNavHeader()
+                }
+            }
+        }
 
         showAlertDialog(alertDialogBinding = alertDialogBinding, function = function)
     }
 
     private fun signOut() {
         val context = requireContext()
-        val function = {viewModel.signOut(context)}
+        val function = { viewModel.signOut(context) }
         val title = context.getString(R.string.are_you_sure)
 
         showAlertDialog(title, function = function)
@@ -122,7 +127,7 @@ class SettingsFragment : Fragment() {
         val context = requireContext()
 
         val alertDialogBinding = activity?.layoutInflater?.let { AlertDialogLayoutBinding.inflate(it) }
-        val function = {viewModel.deleteAccount(alertDialogBinding?.editTxtPassword?.text.toString(), context)}
+        val function = { viewModel.deleteAccount(alertDialogBinding?.editTxtPassword?.text.toString(), context) }
 
         alertDialogBinding?.editTxtAlertDialog?.visibility = View.GONE
         alertDialogBinding?.txtAlertDialogTitle?.text = context.getString(R.string.delete_account)

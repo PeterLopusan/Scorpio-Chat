@@ -46,8 +46,8 @@ class MainActivityViewModel : ViewModel() {
         })
     }
 
-    fun getUserEmail(): String {
-        return auth.currentUser!!.email!!
+    fun getUserEmail(): String? {
+        return auth.currentUser?.email
     }
 
     fun changeUserStatus(isOnline: Boolean) {

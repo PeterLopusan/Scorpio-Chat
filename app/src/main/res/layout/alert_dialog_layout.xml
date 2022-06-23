@@ -29,8 +29,8 @@
         android:id="@+id/editTxt_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:autofillHints="@string/email"
-        android:hint="@string/password"
+        android:autofillHints="@string/confirm_with_password"
+        android:hint="@string/confirm_with_password"
         android:inputType="textPassword"
         android:text="" />
 

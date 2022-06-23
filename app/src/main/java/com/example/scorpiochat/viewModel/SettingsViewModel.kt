@@ -27,13 +27,13 @@ class SettingsViewModel : ViewModel() {
     var userInfo: MutableLiveData<User> = MutableLiveData<User>()
 
     fun loadUserInfo() {
-        database.addValueEventListener(object : ValueEventListener {
+        database.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
 
                 for (dbChild in snapshot.children) {
                     val user = dbChild.child(userInformation).getValue(User::class.java)
                     if (user?.userId == auth.uid) {
-                        userInfo.value = user!!
+                        userInfo.value = user
                         return
                     }
                 }
@@ -53,7 +53,9 @@ class SettingsViewModel : ViewModel() {
     fun changeUsername(newUsername: String) {
         if (newUsername != "") {
             val update = mapOf("username" to newUsername)
-            database.child(auth.uid!!).child(userInformation).updateChildren(update)
+            database.child(auth.uid!!).child(userInformation).updateChildren(update).addOnCompleteListener {
+                loadUserInfo()
+            }
         }
     }
 
@@ -86,13 +88,16 @@ class SettingsViewModel : ViewModel() {
         }
     }
 
-    fun changeEmail(newEmail: String, password: String, context: Context) {
+    fun changeEmail(newEmail: String, password: String, context: Context): MutableLiveData<Boolean?> {
+        val result: MutableLiveData<Boolean?> = MutableLiveData()
+
         if (newEmail.isNotBlank() && password.isNotBlank()) {
             auth.signInWithEmailAndPassword(getUserEmail(), password).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     auth.currentUser!!.updateEmail(newEmail).addOnCompleteListener {
                         if (it.isSuccessful) {
                             Toast.makeText(context, context.getString(R.string.new_email_set), Toast.LENGTH_SHORT).show()
+                            result.value = true
                         } else {
                             Toast.makeText(context, context.getString(R.string.new_email_failed), Toast.LENGTH_SHORT).show()
                         }
@@ -104,6 +109,7 @@ class SettingsViewModel : ViewModel() {
         } else {
             Toast.makeText(context, context.getString(R.string.new_email_failed), Toast.LENGTH_SHORT).show()
         }
+        return result
     }
 
     fun signOut(context: Context) {
@@ -126,11 +132,6 @@ class SettingsViewModel : ViewModel() {
         }
     }
 
-    private fun deleteUserData() {
-        storage.child(auth.uid!!).child(customProfilePicture).delete()
-        storage.child(auth.uid!!).delete()
-        database.child(auth.uid!!).removeValue()
-    }
 
     fun deleteAccount(password: String, context: Context) {
         if (password.isNotBlank()) {
@@ -138,13 +139,22 @@ class SettingsViewModel : ViewModel() {
                 if (task.isSuccessful) {
                     unsubscribeTopic(context)
                     makeUserOffline()
-                    deleteUserData()
+                    database.child(auth.uid!!).child(conversations).removeValue()
 
-                    auth.currentUser?.delete()?.addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            Toast.makeText(context, context.getString(R.string.account_was_deleted), Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(context, context.getString(R.string.delete_account_failed), Toast.LENGTH_SHORT).show()
+                    storage.child(auth.uid!!).apply {
+                        child(customProfilePicture).delete()
+                        delete()
+                    }
+
+                    storage.child(deleteProfilePicture).child(delete_icon).downloadUrl.addOnCompleteListener { downloadTask ->
+                        database.child(auth.uid!!).child(userInformation).setValue(User(userId = auth.uid, customProfilePictureUri = downloadTask.result.toString())).addOnCompleteListener {
+                            auth.currentUser?.delete()?.addOnCompleteListener { deleteTask ->
+                                if (deleteTask.isSuccessful) {
+                                    Toast.makeText(context, context.getString(R.string.account_was_deleted), Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(context, context.getString(R.string.delete_account_failed), Toast.LENGTH_SHORT).show()
+                                }
+                            }
                         }
                     }
                 } else {
@@ -153,6 +163,7 @@ class SettingsViewModel : ViewModel() {
             }
         }
     }
+
 
     fun getUserEmail(): String {
         return auth.currentUser?.email!!

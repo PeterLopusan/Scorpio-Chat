@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="5dp"
         android:orientation="vertical"
-        app:layout_constraintEnd_toStartOf="@+id/img_mute"
+        app:layout_constraintEnd_toStartOf="@+id/layout_message_info"
         app:layout_constraintStart_toEndOf="@id/img_profile_picture"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -55,47 +55,57 @@
             tools:text="Hello. How are you?" />
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/img_mute"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
-        android:layout_marginHorizontal="5dp"
-        android:src="@drawable/ic_baseline_volume_off_24"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@id/txt_time"
-        app:layout_constraintEnd_toStartOf="@id/txt_time"
-        app:layout_constraintTop_toTopOf="@id/txt_time" />
-
-    <TextView
-        android:id="@+id/txt_time"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_message_info"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="12:54" />
+        android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/img_new_message"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="5dp"
-        android:src="@drawable/ic_baseline_fiber_new_24"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@id/txt_time"
-        app:layout_constraintTop_toBottomOf="@id/txt_time" />
+        <ImageView
+            android:id="@+id/img_mute"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_marginHorizontal="5dp"
+            android:src="@drawable/ic_baseline_volume_off_24"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/txt_time"
+            app:layout_constraintEnd_toStartOf="@id/txt_time"
+            app:layout_constraintTop_toTopOf="@id/txt_time" />
 
-    <TextView
-        android:id="@+id/txt_new_message_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/new_message_count_background"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@+id/img_new_message"
-        app:layout_constraintTop_toTopOf="@id/img_new_message"
-        tools:text="5" />
+        <TextView
+            android:id="@+id/txt_time"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="12:54" />
+
+        <ImageView
+            android:id="@+id/img_new_message"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/ic_baseline_fiber_new_24"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/txt_time"
+            app:layout_constraintTop_toBottomOf="@id/txt_time" />
+
+        <TextView
+            android:id="@+id/txt_new_message_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/new_message_count_background"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/img_new_message"
+            app:layout_constraintTop_toTopOf="@id/img_new_message"
+            tools:text="5" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

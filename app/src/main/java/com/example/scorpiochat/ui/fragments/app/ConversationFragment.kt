@@ -63,7 +63,7 @@ class ConversationFragment : Fragment() {
                 }
             }
         }
-        val recyclerAdapter = ConversationAdapter(viewModel.getMyId(), navigationArgs.userId, onItemLongClick, clickToScroll)
+        val recyclerAdapter = viewModel.getMyId()?.let { ConversationAdapter(it, navigationArgs.userId, onItemLongClick, clickToScroll) }
         val previousUserMessageList: MutableList<Pair<Message, Message?>> = mutableListOf()
 
         binding.recyclerMessages.adapter = recyclerAdapter
@@ -71,9 +71,9 @@ class ConversationFragment : Fragment() {
             val filteredList = it.filterNot { previousUserMessageList.contains(it) }
 
             if (filteredList.isEmpty()) {
-                recyclerAdapter.submitList(it)
+                recyclerAdapter?.submitList(it)
             } else {
-                recyclerAdapter.notifyDataSetChanged()
+                recyclerAdapter?.notifyDataSetChanged()
             }
 
             previousUserMessageList.clear()
@@ -83,7 +83,7 @@ class ConversationFragment : Fragment() {
         }
 
         viewModel.userInfo.observe(viewLifecycleOwner) {
-            if(it!= null) {
+            if (it != null) {
                 setUserInformation(it)
             }
             viewModel.loadMessage(navigationArgs.userId)

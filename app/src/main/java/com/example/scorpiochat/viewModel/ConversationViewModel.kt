@@ -46,7 +46,7 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
                 for (dbChild in snapshot.children) {
                     val user = dbChild.child(userInformation).getValue(User::class.java)
                     if (user?.userId == getMyId()) {
-                        myUsername = user.username!!
+                        myUsername = user?.username!!
                     }
                 }
                 userInfo.value = userInfo.value
@@ -64,53 +64,57 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
 
         prepareNotification(message)
         database.apply {
-            child(getMyId()).child(conversations).child(recipientId).child(key).setValue(message)
-            child(recipientId).child(conversations).child(getMyId()).child(key).setValue(message)
+            if (getMyId() != null) {
+                child(getMyId()!!).child(conversations).child(recipientId).child(key).setValue(message)
+                child(recipientId).child(conversations).child(getMyId()!!).child(key).setValue(message)
+            }
         }
     }
 
     fun loadMessage(chatId: String) {
         messagesList.value?.clear()
-        database.child(getMyId()).child(conversations).child(chatId).addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
+        getMyId()?.let {
+            database.child(it).child(conversations).child(chatId).addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
 
-                for (dbChild in snapshot.children) {
-                    val message = dbChild.getValue(Message::class.java)
-                    var duplicate = false
-                    var itemForRemove: Pair<Message, Message?>? = null
+                    for (dbChild in snapshot.children) {
+                        val message = dbChild.getValue(Message::class.java)
+                        var duplicate = false
+                        var itemForRemove: Pair<Message, Message?>? = null
 
-                    if (message != null) {
-                        for (item in messagesList.value!!) {
-                            if (item.first.time == message.time) {
-                                if (item.first.seen == message.seen) {
-                                    duplicate = true
-                                } else {
-                                    itemForRemove = item
-                                }
-                            }
-                        }
-                        messagesList.value?.remove(itemForRemove)
-                        if (!duplicate) {
-                            var repliedToMessage: Message? = null
-                            if (message.repliedTo != null) {
-                                for (item in messagesList.value!!) {
-                                    if (item.first.time == message.repliedTo) {
-                                        repliedToMessage = item.first
+                        if (message != null) {
+                            for (item in messagesList.value!!) {
+                                if (item.first.time == message.time) {
+                                    if (item.first.seen == message.seen) {
+                                        duplicate = true
+                                    } else {
+                                        itemForRemove = item
                                     }
                                 }
                             }
+                            messagesList.value?.remove(itemForRemove)
+                            if (!duplicate) {
+                                var repliedToMessage: Message? = null
+                                if (message.repliedTo != null) {
+                                    for (item in messagesList.value!!) {
+                                        if (item.first.time == message.repliedTo) {
+                                            repliedToMessage = item.first
+                                        }
+                                    }
+                                }
 
-                            messagesList.value?.add(Pair(message, repliedToMessage))
+                                messagesList.value?.add(Pair(message, repliedToMessage))
+                            }
                         }
                     }
+                    messagesList.value = messagesList.value
                 }
-                messagesList.value = messagesList.value
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                Log.d("TAG", error.toString())
-            }
-        })
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d("TAG", error.toString())
+                }
+            })
+        }
     }
 
 
@@ -143,8 +147,8 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
         userInfo.value = null
     }
 
-    fun getMyId(): String {
-        return auth.uid!!
+    fun getMyId(): String? {
+        return auth.uid
     }
 
     private fun prepareNotification(message: Message, actionWithMessage: String? = null) {
@@ -160,7 +164,7 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
             notification.put("to", topic)
             notification.put("data", notificationBody)
         } catch (e: JSONException) {
-            Log.e("TAG", "onCreate: " + e.message)
+            Log.e("TAG", "prepareNotification: " + e.message)
         }
 
         sendNotification(notification)
@@ -196,31 +200,35 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
         val update = mapOf("text" to editedText, "edited" to true)
         val messageKey = message.time.toString()
 
-        database.child(recipientId).child(conversations).child(getMyId()).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.hasChild(messageKey)) {
-                    database.child(recipientId).child(conversations).child(getMyId()).child(messageKey).updateChildren(update)
-                    val newMessage = Message(text = editedText, message.time, message.recipientId, message.seen, message.edited, message.repliedTo)
-                    prepareNotification(newMessage, editThisMessage)
+        getMyId()?.let { myId ->
+            database.child(recipientId).child(conversations).child(myId).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.hasChild(messageKey)) {
+                        getMyId()?.let { database.child(recipientId).child(conversations).child(it).child(messageKey).updateChildren(update) }
+                        val newMessage = Message(text = editedText, message.time, message.recipientId, message.seen, message.edited, message.repliedTo)
+                        prepareNotification(newMessage, editThisMessage)
+                    }
                 }
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                Log.d("TAG", error.toString())
-            }
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d("TAG", error.toString())
+                }
 
-        })
-        database.child(getMyId()).child(conversations).child(recipientId).child(messageKey).updateChildren(update)
+            })
+        }
+        getMyId()?.let { database.child(it).child(conversations).child(recipientId).child(messageKey).updateChildren(update) }
     }
 
     fun deleteMessage(deleteAlsoForAnotherUser: Boolean?, message: Message) {
         val messageKey = message.time.toString()
 
-        if (deleteAlsoForAnotherUser == true) {
-            database.child(userInfo.value?.userId!!).child(conversations).child(getMyId()).child(messageKey).removeValue()
-            prepareNotification(message, deleteThisMessage)
+        if (getMyId() != null) {
+            if (deleteAlsoForAnotherUser == true) {
+                database.child(userInfo.value?.userId!!).child(conversations).child(getMyId()!!).child(messageKey).removeValue()
+                prepareNotification(message, deleteThisMessage)
+            }
+            database.child(getMyId()!!).child(conversations).child(userInfo.value?.userId!!).child(messageKey).removeValue()
         }
-        database.child(getMyId()).child(conversations).child(userInfo.value?.userId!!).child(messageKey).removeValue()
     }
 }
 
