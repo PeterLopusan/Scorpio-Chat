@@ -1,10 +1,10 @@
-package com.example.scorpiochat.viewModel
+package com.example.scorpiochat.viewModels
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.scorpiochat.data.User
-import com.example.scorpiochat.userInformation
+import com.example.scorpiochat.data.userInformation
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -18,21 +18,29 @@ class AddContactViewModel : ViewModel() {
     private val database = FirebaseDatabase.getInstance().reference
     val userList: MutableLiveData<MutableList<User>> = MutableLiveData<MutableList<User>>()
 
-    fun findUsers(searchedText: String) {
-        val temporaryUserList = mutableListOf<User>()
+    init {
+        userList.value = mutableListOf()
+    }
 
-        database.addValueEventListener(object : ValueEventListener {
+    fun findUsers(searchedText: String) {
+        userList.value?.clear()
+        database.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (dbChild in snapshot.children) {
                     val user = dbChild.child(userInformation).getValue(User::class.java)
-                    if(user?.username != null) {
+                    if (user?.username != null) {
                         if (user.username.contains(searchedText, ignoreCase = true) && user.userId != auth.currentUser?.uid) {
-                            temporaryUserList.add(user)
+                            if (user.blockedUsers != null) {
+                                if (!user.blockedUsers!!.contains(auth.uid!!)) {
+                                    userList.value?.add(user)
+                                }
+                            } else {
+                                userList.value?.add(user)
+                            }
                         }
                     }
                 }
-                userList.value?.clear()
-                userList.value = temporaryUserList
+                userList.value = userList.value
             }
 
             override fun onCancelled(error: DatabaseError) {

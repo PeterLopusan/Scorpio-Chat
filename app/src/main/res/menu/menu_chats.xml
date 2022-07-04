@@ -20,4 +20,9 @@
         android:icon="@drawable/ic_baseline_block_24"
         android:title="@string/block" />
 
+    <item
+        android:id="@+id/header_unblock"
+        android:icon="@drawable/ic_baseline_block_24"
+        android:title="@string/unblock" />
+
 </menu>

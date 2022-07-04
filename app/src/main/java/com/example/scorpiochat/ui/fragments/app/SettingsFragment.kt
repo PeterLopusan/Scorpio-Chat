@@ -9,12 +9,12 @@ import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
 import com.example.scorpiochat.R
 import com.example.scorpiochat.databinding.AlertDialogLayoutBinding
 import com.example.scorpiochat.databinding.FragmentSettingsBinding
 import com.example.scorpiochat.ui.activities.MainActivity
-import com.example.scorpiochat.viewModel.SettingsViewModel
-
+import com.example.scorpiochat.viewModels.SettingsViewModel
 
 class SettingsFragment : Fragment() {
 
@@ -53,6 +53,10 @@ class SettingsFragment : Fragment() {
 
             txtResetPassword.setOnClickListener {
                 resetPassword()
+            }
+
+            txtBlockedUsers.setOnClickListener {
+                view.findNavController().navigate(SettingsFragmentDirections.actionNavSettingsToBlockedUsersFragment())
             }
 
             txtChangeEmail.setOnClickListener {

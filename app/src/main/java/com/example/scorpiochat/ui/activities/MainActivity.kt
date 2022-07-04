@@ -3,7 +3,6 @@ package com.example.scorpiochat.ui.activities
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageButton
 import android.widget.TextView
@@ -22,7 +21,7 @@ import com.example.scorpiochat.SharedPreferencesManager
 import com.example.scorpiochat.data.AuthenticationState
 import com.example.scorpiochat.data.User
 import com.example.scorpiochat.databinding.ActivityMainBinding
-import com.example.scorpiochat.viewModel.MainActivityViewModel
+import com.example.scorpiochat.viewModels.MainActivityViewModel
 import com.google.android.material.navigation.NavigationView
 import de.hdodenhof.circleimageview.CircleImageView
 
@@ -131,11 +130,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main, menu)
-        return true
-    }
-
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
@@ -151,5 +145,4 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         viewModel.changeUserStatus(false)
     }
-
 }

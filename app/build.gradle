@@ -57,10 +57,10 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation platform('com.google.firebase:firebase-bom:29.2.1')
     implementation 'com.google.firebase:firebase-database'
-    implementation 'com.google.firebase:firebase-auth-ktx:21.0.5'
-    implementation 'com.google.firebase:firebase-auth:21.0.5'
+    implementation 'com.google.firebase:firebase-auth-ktx:21.0.6'
+    implementation 'com.google.firebase:firebase-auth:21.0.6'
     implementation 'com.firebaseui:firebase-ui-storage:7.2.0'
-    implementation 'com.google.firebase:firebase-messaging-ktx:23.0.5'
+    implementation 'com.google.firebase:firebase-messaging-ktx:23.0.6'
 
 
     //Glide

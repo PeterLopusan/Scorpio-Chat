@@ -12,7 +12,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scorpiochat.*
 import com.example.scorpiochat.data.Message
+import com.example.scorpiochat.data.conversations
 import com.example.scorpiochat.databinding.ConversationAdapterBinding
+import com.example.scorpiochat.utils.getDate
+import com.example.scorpiochat.utils.getTime
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -64,7 +67,7 @@ class ConversationAdapter(val myId: String, val chatId: String, private val onIt
                     layoutMessageRow.gravity = Gravity.START
                     start = 0
                     end = 300
-                    backgroundColor = context.getColor(R.color.purple_500)
+                    backgroundColor = context.getColor(R.color.message_grey_dark)
                     timeAndSeen = getTime(message.time!!, context)
                     if (message.seen == false) {
                         makeMessageSeen(message.time.toString())
@@ -73,7 +76,7 @@ class ConversationAdapter(val myId: String, val chatId: String, private val onIt
                     layoutMessageRow.gravity = Gravity.END
                     start = 300
                     end = 0
-                    backgroundColor = context.getColor(R.color.teal_700)
+                    backgroundColor = context.getColor(R.color.message_grey_light)
 
                     timeAndSeen = if (message.seen == true) {
                         context.getString(R.string.time_seen, getTime(message.time!!, context))

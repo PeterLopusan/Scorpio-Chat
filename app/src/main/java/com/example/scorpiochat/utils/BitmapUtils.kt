@@ -1,4 +1,4 @@
-package com.example.scorpiochat
+package com.example.scorpiochat.utils
 
 import android.content.Context
 import android.graphics.Bitmap

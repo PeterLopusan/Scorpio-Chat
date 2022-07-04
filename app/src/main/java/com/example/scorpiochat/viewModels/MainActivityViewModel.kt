@@ -1,4 +1,4 @@
-package com.example.scorpiochat.viewModel
+package com.example.scorpiochat.viewModels
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -13,6 +13,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import androidx.lifecycle.map
+import com.example.scorpiochat.data.userInformation
 
 class MainActivityViewModel : ViewModel() {
     private val auth = Firebase.auth
@@ -33,7 +34,7 @@ class MainActivityViewModel : ViewModel() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (dbChild in snapshot.children) {
                     val user = dbChild.child(userInformation).getValue(User::class.java)
-                    if (user?.userId == auth.uid && user!=null) {
+                    if (user?.userId == auth.uid && user != null) {
                         userInfo.value = user
                         return
                     }
@@ -56,7 +57,7 @@ class MainActivityViewModel : ViewModel() {
         } else {
             mapOf("online" to isOnline, "lastSeen" to System.currentTimeMillis())
         }
-        if(auth.uid != null) {
+        if (auth.uid != null) {
             database.child(auth.uid!!).child(userInformation).updateChildren(update)
         }
     }

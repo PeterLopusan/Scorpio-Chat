@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
+import android.widget.CheckBox
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,7 +19,7 @@ import com.example.scorpiochat.databinding.AlertDialogMuteConversationLayoutBind
 import com.example.scorpiochat.databinding.FragmentChatsBinding
 import com.example.scorpiochat.ui.activities.MainActivity
 import com.example.scorpiochat.ui.adapters.ChatsAdapter
-import com.example.scorpiochat.viewModel.ChatsViewModel
+import com.example.scorpiochat.viewModels.ChatsViewModel
 
 class ChatsFragment : Fragment() {
     private lateinit var binding: FragmentChatsBinding
@@ -35,8 +35,7 @@ class ChatsFragment : Fragment() {
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.loadKeysAndMessages()
-
+        viewModel.loadMyUserInfo()
         if (navigationArgs.forwardMessage != null) {
             val toolbar = requireActivity().findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
 
@@ -52,27 +51,34 @@ class ChatsFragment : Fragment() {
             showPopupMenu(it)
         }
 
-        val recyclerAdapter = ChatsAdapter(viewModel.getMyId(), activity?.applicationContext, onItemClick, onItemLongClick)
-        val previousUserMessageList: MutableList<Triple<User?, Message, Int>> = mutableListOf()
+        viewModel.myUserInfo.observe(viewLifecycleOwner) { myUserInfo ->
+            if (myUserInfo != null) {
 
-        binding.recyclerChats.apply {
-            adapter = recyclerAdapter
-            addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-        }
+                val recyclerAdapter = ChatsAdapter(myUserInfo, activity?.applicationContext, onItemClick, onItemLongClick)
+                val previousUserMessageList: MutableList<Triple<User?, Message, Int>> = mutableListOf()
 
-        viewModel.listOfUsersAndMessages.observe(viewLifecycleOwner) { it ->
-            val filteredList = it.filterNot { previousUserMessageList.contains(it) }
-            it.sortWith(compareByDescending { it.second.time })
+                binding.recyclerChats.apply {
+                    adapter = recyclerAdapter
+                    addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                }
 
-            if (filteredList.isEmpty()) {
-                recyclerAdapter.submitList(it)
-            } else {
-                recyclerAdapter.notifyDataSetChanged()
-            }
+                viewModel.loadKeysAndMessages()
 
-            previousUserMessageList.clear()
-            for (item in it) {
-                previousUserMessageList.add(item)
+                viewModel.listOfUsersAndMessages.observe(viewLifecycleOwner) { listOfUsersAndMessages ->
+                    val filteredList = listOfUsersAndMessages.filterNot { previousUserMessageList.contains(it) }
+                    listOfUsersAndMessages.sortWith(compareByDescending { it.second.time })
+
+                    if (filteredList.isEmpty()) {
+                        recyclerAdapter.submitList(listOfUsersAndMessages)
+                    } else {
+                        recyclerAdapter.notifyDataSetChanged()
+                    }
+
+                    previousUserMessageList.clear()
+                    for (item in listOfUsersAndMessages) {
+                        previousUserMessageList.add(item)
+                    }
+                }
             }
         }
         binding.fab.setOnClickListener {
@@ -91,17 +97,37 @@ class ChatsFragment : Fragment() {
             menu.add(Menu.NONE, -1, 0, username).apply { isEnabled = false }
             inflate(R.menu.menu_chats)
 
-            if(user.userId?.let { SharedPreferencesManager.getIfUserIsMuted(context, it) } == true) {
+            if (user.userId?.let { SharedPreferencesManager.getIfUserIsMuted(context, it) } == true) {
                 menu.findItem(R.id.header_mute).isVisible = false
             } else {
                 menu.findItem(R.id.header_unmute).isVisible = false
+            }
+
+            if (user.username == null) {
+                menu.apply {
+                    findItem(R.id.header_mute).isVisible = false
+                    findItem(R.id.header_unmute).isVisible = false
+                    findItem(R.id.header_block).isVisible = false
+                }
+            }
+
+            if (viewModel.myUserInfo.value?.blockedUsers?.contains(user.userId) == true) {
+                menu.apply {
+                    findItem(R.id.header_mute).isVisible = false
+                    findItem(R.id.header_unmute).isVisible = false
+                    findItem(R.id.header_block).isVisible = false
+                }
+            } else {
+                menu.apply {
+                    findItem(R.id.header_unblock).isVisible = false
+                }
             }
 
             setForceShowIcon(true)
             setOnMenuItemClickListener { item: MenuItem? ->
                 when (item!!.itemId) {
                     R.id.header_delete -> {
-                        showAlertDialog { viewModel.deleteConversation(user.userId!!) }
+                        showAlertDialog({ viewModel.deleteConversation(user.userId!!) })
                     }
                     R.id.header_mute -> {
                         muteConversation(user.userId!!)
@@ -110,7 +136,12 @@ class ChatsFragment : Fragment() {
                         user.userId?.let { viewModel.unmuteConversation(context, it) }
                     }
                     R.id.header_block -> {
-                        showAlertDialog { Toast.makeText(context, "header3", Toast.LENGTH_SHORT).show() }
+                        val checkbox = CheckBox(context)
+                        checkbox.setText(R.string.also_delete_conversation)
+                        showAlertDialog({ user.userId?.let { viewModel.blockUser(it, checkbox.isChecked) } }, checkbox)
+                    }
+                    R.id.header_unblock -> {
+                        showAlertDialog({ viewModel.unblockUser(user.userId!!) })
                     }
                 }
                 true
@@ -120,10 +151,11 @@ class ChatsFragment : Fragment() {
     }
 
 
-    private fun showAlertDialog(function: () -> Unit) {
+    private fun showAlertDialog(function: () -> Unit, checkBox: CheckBox? = null) {
         val context = requireContext()
         AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.are_you_sure))
+            .setView(checkBox)
             .setPositiveButton(context.getString(R.string.confirm)) { _, _ ->
                 function()
                 view?.findNavController()?.navigate(ChatsFragmentDirections.actionNavHomeSelf())
@@ -161,6 +193,4 @@ class ChatsFragment : Fragment() {
             .create()
             .show()
     }
-
-
 }

@@ -1,4 +1,4 @@
-package com.example.scorpiochat.viewModel
+package com.example.scorpiochat.viewModels
 
 import android.content.Context
 import android.net.Uri
@@ -6,8 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import com.example.scorpiochat.*
-import com.example.scorpiochat.data.AuthenticationState
-import com.example.scorpiochat.data.User
+import com.example.scorpiochat.data.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
@@ -52,7 +51,7 @@ class LoginViewModel : ViewModel() {
                 text.value = context.getString(R.string.welcome_to_scorpio_chat)
             }
         }.addOnFailureListener {
-            when(it.toString()){
+            when (it.toString()) {
                 emailIsUsed -> text.value = context.getString(R.string.email_is_already_used)
                 emailBadlyFormatted -> text.value = context.getString(R.string.email_badly_formatted)
                 invalidPassword -> text.value = context.getString(R.string.invalid_password)

@@ -11,7 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import com.example.scorpiochat.R
 import com.example.scorpiochat.databinding.FragmentLoginBinding
-import com.example.scorpiochat.viewModel.LoginViewModel
+import com.example.scorpiochat.viewModels.LoginViewModel
 
 class LoginFragment : Fragment() {
     private lateinit var binding: FragmentLoginBinding

@@ -11,7 +11,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.scorpiochat.databinding.FragmentAddContactBinding
 import com.example.scorpiochat.ui.adapters.SearchingResultsAdapter
-import com.example.scorpiochat.viewModel.AddContactViewModel
+import com.example.scorpiochat.viewModels.AddContactViewModel
 
 class AddContactFragment : Fragment() {
     private lateinit var binding: FragmentAddContactBinding
@@ -29,7 +29,7 @@ class AddContactFragment : Fragment() {
             view.findNavController().navigate(AddContactFragmentDirections.actionAddContactFragmentToConversationFragment(it.userId!!, navigationArgs.forwardMessage))
         }
 
-        viewModel.userList.observe(viewLifecycleOwner) { it ->
+        viewModel.userList.observe(viewLifecycleOwner) {
             binding.recyclerViewResults.apply {
                 adapter = recyclerAdapter
                 addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))

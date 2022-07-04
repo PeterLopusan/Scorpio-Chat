@@ -1,4 +1,4 @@
-package com.example.scorpiochat.viewModel
+package com.example.scorpiochat.viewModels
 
 import android.content.Context
 import android.net.Uri
@@ -7,7 +7,7 @@ import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.scorpiochat.*
-import com.example.scorpiochat.data.User
+import com.example.scorpiochat.data.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -24,7 +24,7 @@ class SettingsViewModel : ViewModel() {
     private val auth = Firebase.auth
     private val storage = FirebaseStorage.getInstance().reference
     private val database = FirebaseDatabase.getInstance().reference
-    var userInfo: MutableLiveData<User> = MutableLiveData<User>()
+    val userInfo: MutableLiveData<User> = MutableLiveData<User>()
 
     fun loadUserInfo() {
         database.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -119,8 +119,7 @@ class SettingsViewModel : ViewModel() {
     }
 
     private fun makeUserOffline() {
-        val update =
-            mapOf("online" to false, "lastSeen" to System.currentTimeMillis())
+        val update = mapOf("online" to false, "lastSeen" to System.currentTimeMillis())
         database.child(auth.uid!!).child(userInformation).updateChildren(update)
 
     }

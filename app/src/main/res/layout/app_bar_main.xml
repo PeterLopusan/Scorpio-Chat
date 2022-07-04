@@ -20,10 +20,10 @@
 
             <LinearLayout
                 android:id="@+id/layout_toolbar_user_info"
-                android:orientation="horizontal"
-                android:visibility="gone"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/img_toolbar_profile_icon"
@@ -34,27 +34,27 @@
                     tools:src="@drawable/default_icon" />
 
                 <LinearLayout
-                    android:layout_marginHorizontal="5dp"
-                    android:orientation="vertical"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="5dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/txt_toolbar_title"
-                        android:textStyle="bold"
-                        android:textSize="20sp"
-                        android:textColor="@color/design_default_color_on_primary"
-                        tools:text="Peter Lopušan"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/design_default_color_on_primary"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        tools:text="Peter" />
 
                     <TextView
                         android:id="@+id/txt_toolbar_subtitle"
-                        android:textStyle="italic"
-                        tools:text="Last online at 8:56"
-                        android:textColor="@color/design_default_color_on_primary"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/design_default_color_on_primary"
+                        android:textStyle="italic"
+                        tools:text="Last online at 8:56" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>

@@ -23,10 +23,10 @@ import com.example.scorpiochat.R
 import com.example.scorpiochat.data.Message
 import com.example.scorpiochat.data.User
 import com.example.scorpiochat.databinding.FragmentConversationBinding
-import com.example.scorpiochat.getDate
-import com.example.scorpiochat.getTime
+import com.example.scorpiochat.utils.getDate
+import com.example.scorpiochat.utils.getTime
 import com.example.scorpiochat.ui.adapters.ConversationAdapter
-import com.example.scorpiochat.viewModel.ConversationViewModel
+import com.example.scorpiochat.viewModels.ConversationViewModel
 
 class ConversationFragment : Fragment() {
     private lateinit var binding: FragmentConversationBinding
@@ -82,7 +82,7 @@ class ConversationFragment : Fragment() {
             }
         }
 
-        viewModel.userInfo.observe(viewLifecycleOwner) {
+        viewModel.conversationUserInfo.observe(viewLifecycleOwner) {
             if (it != null) {
                 setUserInformation(it)
             }
@@ -95,40 +95,50 @@ class ConversationFragment : Fragment() {
     }
 
     private fun setUserInformation(user: User) {
-        val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
-        val context = requireContext()
-        val title = requireActivity().findViewById<TextView>(R.id.txt_toolbar_title)
-        val subtitle = requireActivity().findViewById<TextView>(R.id.txt_toolbar_subtitle)
-        val profileIcon = requireActivity().findViewById<de.hdodenhof.circleimageview.CircleImageView>(R.id.img_toolbar_profile_icon)
-
-        requireActivity().findViewById<LinearLayout>(R.id.layout_toolbar_user_info).visibility = View.VISIBLE
-        actionBar?.setDisplayShowTitleEnabled(false)
-
-
-        Glide.with(context)
-            .load(user.customProfilePictureUri)
-            .placeholder(R.drawable.loading_animation)
-            .error(R.drawable.loading_animation)
-            .into(profileIcon)
-
-
-        if (user.username != null) {
-            title.text = user.username
-            binding.layoutSendMessage.visibility = View.VISIBLE
-
-            if (user.online == true) {
-                subtitle.text = context.getString(R.string.online)
-            } else {
-                if (getDate(user.lastSeen!!, context) == getDate(System.currentTimeMillis(), context)) {
-                    subtitle.text = context.getString(R.string.last_seen_time, getTime(user.lastSeen!!, context))
-                } else {
-                    subtitle.text = context.getString(R.string.last_seen_date_time, getDate(user.lastSeen!!, context), getTime(user.lastSeen!!, context))
-                }
-            }
-        } else {
-            title.text = context.getString(R.string.deleted_user)
-            subtitle.text = ""
+        if (user.blockedUsers?.contains(viewModel.getMyId()) == true) {
             binding.layoutSendMessage.visibility = View.GONE
+        } else {
+            val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
+            val context = requireContext()
+            val title = requireActivity().findViewById<TextView>(R.id.txt_toolbar_title)
+            val subtitle = requireActivity().findViewById<TextView>(R.id.txt_toolbar_subtitle)
+            val profileIcon = requireActivity().findViewById<de.hdodenhof.circleimageview.CircleImageView>(R.id.img_toolbar_profile_icon)
+
+            requireActivity().findViewById<LinearLayout>(R.id.layout_toolbar_user_info).visibility = View.VISIBLE
+            actionBar?.setDisplayShowTitleEnabled(false)
+
+
+            Glide.with(context)
+                .load(user.customProfilePictureUri)
+                .placeholder(R.drawable.loading_animation)
+                .error(R.drawable.loading_animation)
+                .into(profileIcon)
+
+
+            if (user.username != null) {
+                title.text = user.username
+
+                if (viewModel.myUserInfo.value?.blockedUsers?.contains(user.userId) == true) {
+                    binding.layoutSendMessage.visibility = View.GONE
+                } else {
+                    binding.layoutSendMessage.visibility = View.VISIBLE
+                }
+
+
+                if (user.online == true) {
+                    subtitle.text = context.getString(R.string.online)
+                } else {
+                    if (getDate(user.lastSeen!!, context) == getDate(System.currentTimeMillis(), context)) {
+                        subtitle.text = context.getString(R.string.last_seen_time, getTime(user.lastSeen!!, context))
+                    } else {
+                        subtitle.text = context.getString(R.string.last_seen_date_time, getDate(user.lastSeen!!, context), getTime(user.lastSeen!!, context))
+                    }
+                }
+            } else {
+                title.text = context.getString(R.string.deleted_user)
+                subtitle.text = ""
+                binding.layoutSendMessage.visibility = View.GONE
+            }
         }
     }
 
@@ -162,7 +172,7 @@ class ConversationFragment : Fragment() {
                 menu.removeItem(R.id.header_edit)
             }
 
-            if (viewModel.userInfo.value == null) {
+            if (viewModel.conversationUserInfo.value == null) {
                 menu.apply {
                     removeItem(R.id.header_edit)
                     removeItem(R.id.header_reply)
@@ -202,12 +212,12 @@ class ConversationFragment : Fragment() {
 
     private fun deleteMessage(isNotMyMessage: Boolean, message: Message) {
         val context = requireContext()
-        val checkBox: CheckBox? = if (isNotMyMessage || viewModel.userInfo.value?.username == null) {
+        val checkBox: CheckBox? = if (isNotMyMessage || viewModel.conversationUserInfo.value?.username == null) {
             null
         } else {
             CheckBox(context)
         }
-        checkBox?.text = context.getString(R.string.also_delete_for, viewModel.userInfo.value?.username)
+        checkBox?.text = context.getString(R.string.also_delete_for, viewModel.conversationUserInfo.value?.username)
 
         AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.are_you_sure))
@@ -240,7 +250,7 @@ class ConversationFragment : Fragment() {
                 }
             }
             Action.REPLY -> {
-                title = viewModel.userInfo.value?.username
+                title = viewModel.conversationUserInfo.value?.username
                 logo = R.drawable.ic_baseline_turn_left_24
                 repliedTo = message.time
             }

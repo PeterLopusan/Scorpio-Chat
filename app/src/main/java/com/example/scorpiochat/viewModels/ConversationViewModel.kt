@@ -1,4 +1,4 @@
-package com.example.scorpiochat.viewModel
+package com.example.scorpiochat.viewModels
 
 import android.annotation.SuppressLint
 import android.app.Application
@@ -9,8 +9,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.example.scorpiochat.*
-import com.example.scorpiochat.data.Message
-import com.example.scorpiochat.data.User
+import com.example.scorpiochat.data.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -30,26 +29,25 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
     private val database = FirebaseDatabase.getInstance().reference
     private val storage = FirebaseStorage.getInstance().reference
     var messagesList: MutableLiveData<MutableList<Pair<Message, Message?>>> = MutableLiveData<MutableList<Pair<Message, Message?>>>()
-    var userInfo: MutableLiveData<User> = MutableLiveData<User>()
+    val conversationUserInfo: MutableLiveData<User> = MutableLiveData<User>()
 
-    private lateinit var myUsername: String
+    val myUserInfo: MutableLiveData<User> = MutableLiveData<User>()
 
     init {
         messagesList.value = mutableListOf()
-        getMyUsername()
+        loadMyUserInfo()
     }
 
-    private fun getMyUsername() {
+    private fun loadMyUserInfo() {
         database.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
 
                 for (dbChild in snapshot.children) {
                     val user = dbChild.child(userInformation).getValue(User::class.java)
                     if (user?.userId == getMyId()) {
-                        myUsername = user?.username!!
+                        myUserInfo.value = user
                     }
                 }
-                userInfo.value = userInfo.value
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -126,15 +124,15 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
                 for (dbChild in snapshot.children) {
                     val user = dbChild.child(userInformation).getValue(User::class.java)
                     if (user?.userId == userId) {
-                        userInfo.value = user
-                        userInfo.value = userInfo.value
+                        conversationUserInfo.value = user
+                        conversationUserInfo.value = conversationUserInfo.value
                         return
                     }
                 }
                 storage.child(deleteProfilePicture).child(delete_icon).downloadUrl.addOnCompleteListener { task ->
-                    userInfo.value = User(customProfilePictureUri = task.result.toString())
+                    conversationUserInfo.value = User(customProfilePictureUri = task.result.toString())
                 }
-                userInfo.value = userInfo.value
+                conversationUserInfo.value = conversationUserInfo.value
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -144,7 +142,7 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
     }
 
     fun clearUserInfo() {
-        userInfo.value = null
+        conversationUserInfo.value = null
     }
 
     fun getMyId(): String? {
@@ -156,7 +154,7 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
         val notification = JSONObject()
         val notificationBody = JSONObject()
         try {
-            notificationBody.put("title", myUsername)
+            notificationBody.put("title", myUserInfo.value?.username)
             notificationBody.put("message", message.text)
             notificationBody.put("senderId", auth.uid)
             notificationBody.put("time", message.time)
@@ -224,10 +222,10 @@ class ConversationViewModel(application: Application) : AndroidViewModel(applica
 
         if (getMyId() != null) {
             if (deleteAlsoForAnotherUser == true) {
-                database.child(userInfo.value?.userId!!).child(conversations).child(getMyId()!!).child(messageKey).removeValue()
+                database.child(conversationUserInfo.value?.userId!!).child(conversations).child(getMyId()!!).child(messageKey).removeValue()
                 prepareNotification(message, deleteThisMessage)
             }
-            database.child(getMyId()!!).child(conversations).child(userInfo.value?.userId!!).child(messageKey).removeValue()
+            database.child(getMyId()!!).child(conversations).child(conversationUserInfo.value?.userId!!).child(messageKey).removeValue()
         }
     }
 }

@@ -16,8 +16,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.scorpiochat.databinding.ComponentSetProfilePictureBinding
-import com.example.scorpiochat.getImageUri
-import com.example.scorpiochat.getResizedBitmap
+import com.example.scorpiochat.utils.getImageUri
+import com.example.scorpiochat.utils.getResizedBitmap
 
 class ComponentSetProfilePicture @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttrs: Int = 0) : LinearLayout(context, attrs, defStyleAttrs) {
 

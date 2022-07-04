@@ -33,7 +33,11 @@
         android:id="@+id/nav_settings"
         android:name="com.example.scorpiochat.ui.fragments.app.SettingsFragment"
         android:label="@string/settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_nav_settings_to_blockedUsersFragment"
+            app:destination="@id/blockedUsersFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_about_app"
@@ -70,4 +74,9 @@
             app:argType="string"
             app:nullable="true" />
     </fragment>
+    <fragment
+        android:id="@+id/blockedUsersFragment"
+        android:name="com.example.scorpiochat.ui.fragments.app.BlockedUsersFragment"
+        android:label="@string/blocked_users"
+        tools:layout="@layout/fragment_blocked_users" />
 </navigation>

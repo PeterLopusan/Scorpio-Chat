@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.scorpiochat.R
 import com.example.scorpiochat.databinding.FragmentCreateAccountBinding
-import com.example.scorpiochat.viewModel.LoginViewModel
+import com.example.scorpiochat.viewModels.LoginViewModel
 
 
 class CreateAccountFragment : Fragment() {

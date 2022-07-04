@@ -1,11 +1,5 @@
 <resources>
     <string name="app_name">Scorpio Chat</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Nastavenia</string>
 
 
     <string name="username">Uživateľské meno</string>
@@ -35,6 +29,7 @@
     <string name="last_seen_date_time">Naposledy online %1$s o %2$s</string>
     <string name="online">Online</string>
     <string name="deleted_user"><b><i>Vymazaný použivateľ</i></b></string>
+    <string name="blocked_user"><b><i>Blokovaný použivateľ</i></b></string>
     <string name="search_contact">Vyhľadať kontakt</string>
     <string name="account"><u>Účet</u> </string>
     <string name="general"><u>Všeobecné (príde čoskoro)</u> </string>
@@ -61,6 +56,7 @@
     <string name="delete">Vymazať</string>
     <string name="mute">Stíšiť</string>
     <string name="block">Zablokovať</string>
+    <string name="unblock">Odblokovať</string>
     <string name="reply">Odpovedať</string>
     <string name="copy">Kopírovať</string>
     <string name="forward">Preposlať</string>
@@ -76,10 +72,12 @@
     <string name="eight_hours">8 hodín</string>
     <string name="permanently">Natrvalo</string>
     <string name="unmute">Zapnúť upozornenia</string>
+    <string name="also_delete_conversation">Vymazať taktiež konverzáciu</string>
+    <string name="blocked_users">Blokovaní použivatelia</string>
+    <string name="no_blocked_users">Nemáte žiadných zablokovaných používateľov</string>
 
 
     <string name="shared_pref_topic">Topic</string>
     <string name="shared_pref_dark_theme">Dark Theme</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

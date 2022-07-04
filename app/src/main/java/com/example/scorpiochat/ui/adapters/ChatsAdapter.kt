@@ -2,7 +2,6 @@ package com.example.scorpiochat.ui.adapters
 
 import android.content.Context
 import android.graphics.Typeface
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,20 +9,20 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.scorpiochat.*
+import com.example.scorpiochat.R
+import com.example.scorpiochat.SharedPreferencesManager
 import com.example.scorpiochat.data.Message
 import com.example.scorpiochat.data.User
 import com.example.scorpiochat.databinding.ChatsAdapterBinding
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
+import com.example.scorpiochat.utils.getDate
+import com.example.scorpiochat.utils.getTime
 
 class ChatsAdapter(
-    private val myId: String,
+    private val myUserInfo: User,
     private val applicationContext: Context?,
     private val onItemClicked: (Pair<User, Message>) -> Unit,
     private val onItemLongClick: (Pair<User, View>) -> Unit
-) :
-    ListAdapter<Triple<User, Message, Int>, ChatsAdapter.ChatsHolder>(DiffCallbackChats) {
+) : ListAdapter<Triple<User, Message, Int>, ChatsAdapter.ChatsHolder>(DiffCallbackChats) {
 
     inner class ChatsHolder(private val binding: ChatsAdapterBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -33,27 +32,34 @@ class ChatsAdapter(
             val message = data.second
             val newMessageCount = data.third
             val context = binding.root.context
-
             val username: String
             val visibility: Int
+            val showProfilePicture: Boolean
 
             if (user.username == null) {
                 username = context.getString(R.string.deleted_user)
                 visibility = View.GONE
+                showProfilePicture = true
             } else {
                 username = user.username
 
-                visibility = if (user.online == true) {
-                    View.VISIBLE
+                if (user.blockedUsers?.contains(myUserInfo.userId) == true) {
+                    visibility = View.GONE
+                    showProfilePicture = false
                 } else {
-                    View.GONE
+                    visibility = if (user.online == true) {
+                        View.VISIBLE
+                    } else {
+                        View.GONE
+                    }
+                    showProfilePicture = true
                 }
             }
 
             binding.apply {
                 txtUsername.text = username
                 txtMessage.text = message.text
-                if (message.recipientId == myId && message.seen == false) {
+                if (message.recipientId == myUserInfo.userId && message.seen == false) {
                     txtMessage.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC)
                     imgNewMessage.visibility = View.VISIBLE
                     txtNewMessageCount.visibility = View.VISIBLE
@@ -64,10 +70,16 @@ class ChatsAdapter(
                     txtNewMessageCount.visibility = View.GONE
                 }
 
-                if(user.userId?.let { SharedPreferencesManager.getIfUserIsMuted(context, it) } == true) {
-                    imgMute.visibility = View.VISIBLE
+
+                if (myUserInfo.blockedUsers?.contains(user.userId) == true) {
+                    imgBlock.visibility = View.VISIBLE
                 } else {
-                    imgMute.visibility = View.GONE
+                    imgBlock.visibility = View.GONE
+                    if (user.userId?.let { SharedPreferencesManager.getIfUserIsMuted(context, it) } == true) {
+                        imgMute.visibility = View.VISIBLE
+                    } else {
+                        imgMute.visibility = View.GONE
+                    }
                 }
 
                 if (getDate(message.time!!, context) == getDate(System.currentTimeMillis(), context)) {
@@ -79,11 +91,19 @@ class ChatsAdapter(
                 imgOnlineIcon.visibility = visibility
 
                 if (applicationContext != null) {
-                    Glide.with(applicationContext)
-                        .load(user.customProfilePictureUri)
-                        .placeholder(R.drawable.loading_animation)
-                        .error(R.drawable.loading_animation)
-                        .into(binding.imgProfilePicture)
+                    if (showProfilePicture) {
+                        Glide.with(applicationContext)
+                            .load(user.customProfilePictureUri)
+                            .placeholder(R.drawable.loading_animation)
+                            .error(R.drawable.loading_animation)
+                            .into(binding.imgProfilePicture)
+                    } else {
+                        Glide.with(applicationContext)
+                            .load(context.getDrawable(R.drawable.ic_baseline_block_24))
+                            .placeholder(R.drawable.loading_animation)
+                            .error(R.drawable.loading_animation)
+                            .into(binding.imgProfilePicture)
+                    }
                 }
             }
         }

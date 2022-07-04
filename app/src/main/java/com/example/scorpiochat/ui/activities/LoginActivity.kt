@@ -4,15 +4,13 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.scorpiochat.R
-import com.example.scorpiochat.SharedPreferencesManager
 import com.example.scorpiochat.data.AuthenticationState
-import com.example.scorpiochat.viewModel.LoginViewModel
+import com.example.scorpiochat.viewModels.LoginViewModel
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var navController: NavController

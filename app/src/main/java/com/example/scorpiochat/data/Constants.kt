@@ -1,4 +1,4 @@
-package com.example.scorpiochat
+package com.example.scorpiochat.data
 
 const val userInformation = "userInformation"
 const val conversations = "conversations"
