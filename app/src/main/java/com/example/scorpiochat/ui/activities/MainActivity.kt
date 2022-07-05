@@ -145,4 +145,13 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         viewModel.changeUserStatus(false)
     }
+
+    override fun onBackPressed() {
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        if(navController.currentDestination?.id == R.id.nav_home) {
+            finishAffinity()
+        }
+        super.onBackPressed()
+
+    }
 }
